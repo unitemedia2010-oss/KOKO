@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Koko Linh — The Visionary Operator. Executive Creative Portfolio: hệ thống, đội ngũ, văn hóa và hành trình phát triển cùng Unite Group." />
+  <meta name="theme-color" content="#090909" />
+  <title>KOKO LINH — The Visionary Operator</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800;900&display=swap&subset=vietnamese" rel="stylesheet" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    :root {
+      --bg: #090909;
+      --bg-soft: #101010;
+      --card: #151515;
+      --text: #f2efe8;
+      --muted: #94918d;
+      --line: rgba(255,255,255,.12);
+      --line-strong: rgba(255,255,255,.24);
+      --wine: #ba1126;
+      --wine-2: #7c1724;
+      --paper: #e8e0d5;
+      --shadow: 0 30px 80px rgba(0,0,0,.35);
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --display: Montserrat, Inter, sans-serif;
+    }
+    html[data-theme="light"] {
+      --bg: #f5f1eb;
+      --bg-soft: #fffdfa;
+      --card: #eee9e2;
+      --text: #151515;
+      --muted: #6d6964;
+      --line: rgba(0,0,0,.12);
+      --line-strong: rgba(0,0,0,.24);
+      --shadow: 0 30px 70px rgba(72,51,45,.13);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--wine) transparent; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      transition: background .45s ease, color .45s ease;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: .027;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.75'/%3E%3C/svg%3E");
+    }
+    ::selection { background: var(--wine); color: #fff; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button { font: inherit; }
+    .shell { width: min(1280px, calc(100% - 48px)); margin: 0 auto; }
+    .section { position: relative; padding: 140px 0; }
+    .section-rule { border-top: 1px solid var(--line); }
+    .eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 24px; font-size: 10px; letter-spacing: .34em; text-transform: uppercase; color: var(--wine); font-weight: 600; }
+    .eyebrow::before { content: ""; width: 52px; height: 1px; background: var(--wine); }
+    .serif { font-family: var(--serif); }
+    .display { font-family: var(--display); }
+    .muted { color: var(--muted); }
+    .wine { color: var(--wine); }
+    .outline-text { color: transparent; -webkit-text-stroke: 1px var(--line-strong); }
+    .reveal { opacity: 0; transform: translateY(28px); }
+    .reveal-left { opacity: 0; transform: translateX(-28px); }
+    .reveal-right { opacity: 0; transform: translateX(28px); }
+
+    /* nav */
+    .nav {
+      position: fixed; inset: 0 0 auto 0; z-index: 80;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 25px 34px;
+      mix-blend-mode: difference; color: #fff;
+      pointer-events: none;
+    }
+    .brand, .nav-links, .theme-toggle { pointer-events: auto; }
+    .brand { font: 800 18px/1 var(--display); letter-spacing: .26em; }
+    .brand i { color: #ff2943; font-style: normal; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { font-size: 10px; text-transform: uppercase; letter-spacing: .22em; opacity: .55; transition: opacity .2s ease; }
+    .nav-links a:hover { opacity: 1; }
+    .theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3); background: rgba(10,10,10,.2); color: white; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(10px); }
+    .theme-toggle svg { width: 16px; height: 16px; }
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 2px; z-index: 100; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg,var(--wine),#ed2440); }
+
+    /* hero */
+    .hero { min-height: 100svh; position: relative; overflow: hidden; display: grid; place-items: center; }
+    .hero-word { position: absolute; font: 900 clamp(86px, 14vw, 220px)/.78 var(--display); letter-spacing: -.07em; white-space: nowrap; opacity: .24; pointer-events: none; }
+    .hero-word.one { top: 15%; left: -4%; }
+    .hero-word.two { bottom: 12%; right: -5%; }
+    .hero-frame { position: absolute; width: min(32vw, 430px); height: min(74vh, 650px); border-radius: 4px; overflow: hidden; box-shadow: var(--shadow); z-index: 1; }
+    .hero-frame img { width: 100%; height: 100%; object-fit: cover; object-position: 52% 45%; filter: saturate(.78) contrast(1.03); transform: scale(1.05); }
+    .hero-frame::after { content:""; position:absolute; inset:0; background: linear-gradient(180deg,transparent 55%,rgba(0,0,0,.55)); }
+    .hero-copy { position: relative; z-index: 3; text-align: center; width: min(1000px, 92vw); color: #fff; text-shadow: 0 2px 35px rgba(0,0,0,.35); mix-blend-mode: difference; }
+    .hero-kicker { margin: 0 0 22px; font-size: 10px; letter-spacing: .48em; text-transform: uppercase; opacity: .65; }
+    .hero-copy h1 { margin: 0; font: 900 clamp(60px, 9vw, 138px)/.82 var(--display); letter-spacing: -.065em; text-transform: uppercase; }
+    .hero-copy h1 span { color: #ff2741; }
+    .hero-copy h2 { margin: 26px auto 0; font: italic 500 clamp(25px, 3vw, 42px)/1.1 var(--serif); max-width: 900px; }
+    .hero-actions { display: flex; justify-content: center; gap: 12px; margin-top: 36px; mix-blend-mode: normal; }
+    .hero-actions a { border: 1px solid rgba(255,255,255,.45); background: rgba(0,0,0,.2); backdrop-filter: blur(10px); padding: 13px 18px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; transition: .25s ease; }
+    .hero-actions a.primary { background: var(--wine); border-color: var(--wine); }
+    .hero-actions a:hover { transform: translateY(-2px); background: #fff; color: #111; border-color:#fff; }
+    .hero-scroll { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); z-index:4; font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:#fff; opacity:.55; }
+
+    /* manifesto */
+    .manifesto .quote { margin: 0; font: 500 clamp(38px, 5.5vw, 74px)/1.12 var(--serif); max-width: 1120px; letter-spacing: -.02em; }
+    .stats { margin-top: 88px; padding-top: 38px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+    .stat strong { display:block; font: 800 clamp(42px, 5vw, 70px)/1 var(--display); letter-spacing:-.05em; }
+    .stat span { display:block; margin-top:12px; color:var(--muted); font-size:9px; letter-spacing:.2em; text-transform:uppercase; }
+
+    /* about */
+    .about-grid { display:grid; grid-template-columns: 1.02fr .98fr; gap: 84px; align-items:center; }
+    .about-collage { position:relative; min-height:720px; }
+    .about-photo-a { position:absolute; left:0; top:0; width:68%; height:78%; overflow:hidden; box-shadow:var(--shadow); }
+    .about-photo-a img, .about-photo-b img { width:100%; height:100%; object-fit:cover; }
+    .about-photo-b { position:absolute; right:0; bottom:0; width:52%; height:47%; border:7px solid var(--bg); overflow:hidden; box-shadow:var(--shadow); transition:border-color .45s ease; }
+    .about-index { position:absolute; right:3%; top:4%; font:900 120px/1 var(--display); color:transparent; -webkit-text-stroke:1px var(--line-strong); }
+    .about-copy h2 { margin:0 0 32px; font: 500 clamp(40px,4.5vw,64px)/1.05 var(--serif); }
+    .about-copy p { color:var(--muted); font-size:15px; line-height:1.85; margin:0 0 20px; }
+    .signature { margin-top:36px; padding-top:28px; border-top:1px solid var(--line); }
+    .signature strong { display:block; font:italic 500 30px/1 var(--serif); }
+    .signature span { display:block; margin-top:10px; color:var(--muted); font-size:9px; letter-spacing:.25em; text-transform:uppercase; }
+
+    /* operator editorial */
+    .operator { min-height: 870px; background: linear-gradient(145deg,#170509 0%,#2a060c 48%,#0b0b0b 100%); color:#f5eee9; overflow:hidden; display:flex; align-items:center; }
+    html[data-theme="light"] .operator { background: linear-gradient(145deg,#f8e7e9 0%,#ead4d7 50%,#f7f2ec 100%); color:#171717; }
+    .operator-bg { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:900 clamp(130px,19vw,300px)/.8 var(--display); letter-spacing:-.08em; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.15); white-space:nowrap; }
+    html[data-theme="light"] .operator-bg { -webkit-text-stroke:1px rgba(0,0,0,.12); }
+    .operator-copy { position:relative; z-index:3; width:48%; padding-left:4vw; }
+    .operator-copy h2 { font:800 clamp(50px,7vw,104px)/.9 var(--display); letter-spacing:-.06em; margin:0 0 28px; text-transform:uppercase; }
+    .operator-copy p { font-size:15px; line-height:1.8; max-width:560px; color:rgba(245,238,233,.7); }
+    html[data-theme="light"] .operator-copy p { color:#5e5556; }
+    .operator-person { position:absolute; right:2%; bottom:-1%; height:96%; width:auto; z-index:2; filter:drop-shadow(0 30px 45px rgba(0,0,0,.45)); }
+    .operator-note { display:flex; gap:38px; margin-top:38px; }
+    .operator-note div { max-width:170px; }
+    .operator-note b { font:700 11px/1 var(--display); letter-spacing:.18em; text-transform:uppercase; }
+    .operator-note span { display:block; margin-top:9px; font-size:12px; line-height:1.6; opacity:.64; }
+
+    /* how builds */
+    .how-head { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:end; margin-bottom:64px; }
+    .how-head h2 { margin:0; font:800 clamp(54px,7vw,100px)/.88 var(--display); letter-spacing:-.06em; text-transform:uppercase; }
+    .how-head p { margin:0 0 8px; font:italic 500 30px/1.25 var(--serif); color:var(--muted); max-width:520px; }
+    .build-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .build-card { min-height:410px; padding:32px; border:1px solid var(--line); background:var(--bg-soft); position:relative; overflow:hidden; transition:.35s ease; }
+    .build-card:hover { transform:translateY(-7px); border-color:rgba(186,17,38,.55); }
+    .build-card .num { font:800 72px/1 var(--display); color:transparent; -webkit-text-stroke:1px var(--line-strong); }
+    .build-card h3 { margin:90px 0 16px; font:800 28px/1 var(--display); text-transform:uppercase; letter-spacing:-.04em; }
+    .build-card p { color:var(--muted); line-height:1.75; font-size:14px; }
+    .build-card::after { content:""; position:absolute; left:32px; right:32px; bottom:0; height:2px; background:var(--wine); transform:scaleX(0); transform-origin:left; transition:.4s ease; }
+    .build-card:hover::after { transform:scaleX(1); }
+
+    /* journey */
+    .journey-wrap { position:relative; height:100vh; overflow:hidden; background:var(--bg-soft); }
+    .journey-track { display:flex; height:100%; width:max-content; }
+    .journey-panel { width:100vw; height:100vh; flex:none; padding:70px max(24px,6vw); display:flex; align-items:center; position:relative; }
+    .journey-title { width:100vw; }
+    .journey-title h2 { margin:0; font:900 clamp(78px,12vw,190px)/.78 var(--display); letter-spacing:-.08em; text-transform:uppercase; }
+    .journey-title .serif-line { margin-left:6vw; font:italic 500 clamp(60px,10vw,160px)/.8 var(--serif); color:var(--muted); }
+    .journey-media { width:min(72vw,1080px); height:min(70vh,720px); overflow:hidden; position:relative; box-shadow:var(--shadow); }
+    .journey-media img { width:100%; height:100%; object-fit:cover; filter:saturate(.72) contrast(1.04); }
+    .journey-media::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.45),transparent 60%); }
+    .journey-card { position:absolute; left:52%; bottom:10%; width:min(490px,42vw); padding:28px; background:color-mix(in srgb,var(--bg) 87%,transparent); backdrop-filter:blur(18px); border-left:2px solid var(--wine); box-shadow:var(--shadow); }
+    .journey-card .year { font:800 42px/1 var(--display); color:var(--wine); letter-spacing:-.05em; }
+    .journey-card h3 { margin:10px 0; font:500 28px/1 var(--serif); }
+    .journey-card p { margin:0; color:var(--muted); line-height:1.7; font-size:13px; }
+
+    /* case study */
+    .case-head { display:flex; justify-content:space-between; align-items:end; gap:30px; margin-bottom:56px; }
+    .case-head h2 { margin:0; font:900 clamp(64px,9vw,142px)/.78 var(--display); letter-spacing:-.075em; text-transform:uppercase; }
+    .case-head p { max-width:420px; margin:0 0 7px; color:var(--muted); line-height:1.7; }
+    .case-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; }
+    .case-card { position:relative; overflow:hidden; border:1px solid var(--line); background:var(--bg-soft); min-height:260px; padding:28px; }
+    .case-card h3 { margin:0; font:700 24px/1.1 var(--display); letter-spacing:-.04em; }
+    .case-card p { color:var(--muted); line-height:1.7; font-size:13px; max-width:520px; }
+    .case-card .tag { display:block; margin-bottom:12px; color:var(--wine); font-size:9px; letter-spacing:.22em; text-transform:uppercase; font-weight:700; }
+    .case-service { grid-column:span 7; min-height:420px; display:flex; flex-direction:column; justify-content:end; color:#fff; }
+    .case-service img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .case-service::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.9),rgba(0,0,0,.1)); }
+    .case-service > *:not(img) { position:relative; z-index:2; }
+    .case-kpi { grid-column:span 5; background:var(--wine); color:#fff; display:flex; flex-direction:column; justify-content:space-between; min-height:420px; border-color:transparent; }
+    .case-kpi strong { font:900 clamp(78px,9vw,132px)/.8 var(--display); letter-spacing:-.08em; }
+    .case-kpi p { color:rgba(255,255,255,.8); }
+    .case-small { grid-column:span 4; }
+    .case-wide { grid-column:span 8; min-height:340px; color:#fff; display:flex; align-items:end; }
+    .case-wide img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .case-wide::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.85),rgba(0,0,0,.1)); }
+    .case-wide > *:not(img) { position:relative; z-index:2; }
+
+    /* people */
+    .people { overflow:hidden; }
+    .people-grid { display:grid; grid-template-columns:.92fr 1.08fr; gap:70px; align-items:center; }
+    .people-copy h2 { margin:0; font:900 clamp(58px,8vw,120px)/.82 var(--display); letter-spacing:-.07em; text-transform:uppercase; }
+    .people-copy .lead { margin:32px 0; font:italic 500 32px/1.2 var(--serif); }
+    .people-copy p { color:var(--muted); line-height:1.8; font-size:14px; }
+    .people-photo { position:relative; min-height:650px; }
+    .people-photo .main { position:absolute; inset:0 9% 10% 0; overflow:hidden; }
+    .people-photo .main img { width:100%; height:100%; object-fit:cover; }
+    .people-photo .float { position:absolute; width:47%; right:0; bottom:0; border:6px solid var(--bg); box-shadow:var(--shadow); transition:border-color .45s ease; }
+
+    /* POV */
+    .pov { background:var(--paper); color:#121212; }
+    .pov .eyebrow { color:var(--wine); }
+    .pov-head { display:flex; justify-content:space-between; gap:40px; align-items:end; }
+    .pov-head h2 { margin:0; font:900 clamp(72px,11vw,170px)/.8 var(--display); letter-spacing:-.08em; text-transform:uppercase; }
+    .pov-head p { max-width:380px; color:#6d6761; line-height:1.7; }
+    .pov-list { margin-top:60px; border-top:1px solid rgba(0,0,0,.18); }
+    .pov-item { display:grid; grid-template-columns:90px 1fr auto; gap:30px; align-items:center; padding:34px 0; border-bottom:1px solid rgba(0,0,0,.18); }
+    .pov-item .idx { font:700 12px/1 var(--display); color:var(--wine); }
+    .pov-item h3 { margin:0; font:500 clamp(31px,4vw,55px)/1.05 var(--serif); letter-spacing:-.02em; }
+    .pov-item span:last-child { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#776e67; }
+
+    /* lifestyle */
+    .lifestyle { min-height:900px; display:flex; align-items:center; overflow:hidden; background:var(--bg-soft); }
+    .lifestyle-photo { position:absolute; inset:0 0 0 48%; overflow:hidden; }
+    .lifestyle-photo img { width:100%; height:100%; object-fit:cover; object-position:center; }
+    .lifestyle-photo::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,var(--bg-soft),transparent 35%); }
+    .lifestyle-copy { position:relative; z-index:2; max-width:610px; }
+    .lifestyle-copy h2 { margin:0; font:900 clamp(58px,8vw,112px)/.82 var(--display); letter-spacing:-.07em; text-transform:uppercase; }
+    .lifestyle-copy p { color:var(--muted); line-height:1.85; font-size:15px; max-width:520px; }
+    .lifestyle-figure { position:absolute; height:87%; right:4%; bottom:0; z-index:3; filter:drop-shadow(0 25px 35px rgba(0,0,0,.32)); }
+
+    /* gallery */
+    .gallery-head { display:flex; justify-content:space-between; align-items:end; gap:30px; margin-bottom:48px; }
+    .gallery-head h2 { margin:0; font:800 clamp(48px,6vw,88px)/.9 var(--display); letter-spacing:-.06em; text-transform:uppercase; }
+    .gallery-head p { color:var(--muted); max-width:420px; line-height:1.7; }
+    .gallery-grid { display:grid; grid-template-columns:1.15fr .85fr .85fr; grid-template-rows:330px 330px; gap:16px; }
+    .gallery-item { overflow:hidden; position:relative; }
+    .gallery-item:first-child { grid-row:span 2; }
+    .gallery-item img { width:100%; height:100%; object-fit:cover; transition:transform .8s cubic-bezier(.2,.7,.2,1), filter .5s ease; filter:saturate(.78); }
+    .gallery-item:hover img { transform:scale(1.045); filter:saturate(1); }
+
+    /* next */
+    .next { min-height:900px; overflow:hidden; background:#0b0b0b; color:#f4eee8; display:flex; align-items:center; }
+    html[data-theme="light"] .next { background:#151515; }
+    .next-word { position:absolute; left:-3%; top:7%; font:900 clamp(120px,20vw,320px)/.8 var(--display); letter-spacing:-.09em; color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.12); white-space:nowrap; }
+    .next-copy { position:relative; z-index:3; width:55%; }
+    .next-copy h2 { margin:0; font:900 clamp(56px,8vw,120px)/.82 var(--display); letter-spacing:-.07em; text-transform:uppercase; }
+    .next-copy blockquote { margin:34px 0 0; font:italic 500 clamp(27px,3vw,42px)/1.2 var(--serif); color:#d8d0ca; max-width:640px; }
+    .next-copy p { color:#8f8883; line-height:1.8; max-width:530px; }
+    .next-figure { position:absolute; right:3%; bottom:0; height:91%; z-index:2; filter:drop-shadow(0 30px 50px rgba(0,0,0,.42)); }
+
+    /* contact */
+    .contact { min-height:78vh; background:linear-gradient(145deg,#2c060d,#130306); color:#fff; display:grid; place-items:center; text-align:center; overflow:hidden; }
+    .contact::before { content:""; position:absolute; width:46vw; height:46vw; border-radius:50%; background:rgba(186,17,38,.34); filter:blur(110px); }
+    .contact-inner { position:relative; z-index:2; }
+    .contact h2 { margin:0; font:italic 500 clamp(68px,10vw,154px)/.8 var(--serif); }
+    .contact p { color:rgba(255,255,255,.65); max-width:520px; line-height:1.75; margin:28px auto 36px; }
+    .contact-btn { width:150px; height:150px; border-radius:50%; border:1px solid rgba(255,255,255,.38); display:grid; place-items:center; margin:0 auto; font:700 10px/1 var(--display); letter-spacing:.18em; text-transform:uppercase; transition:.35s ease; }
+    .contact-btn:hover { background:#fff; color:#111; transform:scale(1.06); }
+    footer { border-top:1px solid rgba(255,255,255,.11); background:#090909; color:#f2efe8; padding:56px 0; }
+    .footer-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:50px; }
+    footer .logo { font:800 32px/1 var(--display); letter-spacing:.18em; }
+    footer p, footer a { color:#777; font-size:12px; line-height:1.7; }
+    footer .label { display:block; color:#aaa; font-size:9px; letter-spacing:.2em; text-transform:uppercase; margin-bottom:14px; }
+    .copyright { margin-top:45px; padding-top:26px; border-top:1px solid rgba(255,255,255,.1); color:#555; font-size:10px; display:flex; justify-content:space-between; gap:20px; }
+
+    /* mobile */
+    @media (max-width: 980px) {
+      .shell { width:min(calc(100% - 32px), 760px); }
+      .section { padding:100px 0; }
+      .nav { padding:20px 18px; }
+      .nav-links { display:none; }
+      .hero-frame { width:min(65vw,380px); height:64vh; }
+      .hero-word { opacity:.16; }
+      .stats { grid-template-columns:repeat(2,1fr); }
+      .about-grid, .people-grid { grid-template-columns:1fr; gap:54px; }
+      .about-collage { min-height:640px; }
+      .operator { min-height:880px; align-items:flex-start; padding-top:100px; }
+      .operator-copy { width:78%; padding-left:24px; }
+      .operator-person { height:68%; right:-10%; }
+      .how-head { grid-template-columns:1fr; gap:28px; }
+      .build-grid { grid-template-columns:1fr; }
+      .build-card { min-height:290px; }
+      .build-card h3 { margin-top:55px; }
+      .journey-wrap { height:auto; overflow:visible; }
+      .journey-track { display:block; width:auto; }
+      .journey-panel { width:auto; height:auto; min-height:80vh; padding:80px 16px; display:block; }
+      .journey-title { width:auto; min-height:72vh; display:flex; flex-direction:column; justify-content:center; }
+      .journey-media { width:100%; height:58vh; }
+      .journey-card { position:relative; left:auto; bottom:auto; width:calc(100% - 28px); margin:-100px 14px 0; z-index:3; }
+      .case-head { display:block; }
+      .case-head p { margin-top:28px; }
+      .case-service, .case-kpi, .case-small, .case-wide { grid-column:span 12; }
+      .people-photo { min-height:560px; }
+      .pov-head { display:block; }
+      .pov-head p { margin-top:28px; }
+      .pov-item { grid-template-columns:45px 1fr; }
+      .pov-item span:last-child { display:none; }
+      .lifestyle { min-height:900px; align-items:flex-start; padding-top:100px; }
+      .lifestyle-photo { inset:42% 0 0 0; }
+      .lifestyle-photo::after { background:linear-gradient(180deg,var(--bg-soft),transparent 35%); }
+      .lifestyle-figure { height:52%; right:-17%; }
+      .lifestyle-copy { width:78%; }
+      .gallery-grid { grid-template-columns:1fr 1fr; grid-template-rows:420px 260px 260px; }
+      .gallery-item:first-child { grid-column:span 2; grid-row:auto; }
+      .next { min-height:900px; align-items:flex-start; padding-top:110px; }
+      .next-copy { width:78%; }
+      .next-figure { height:59%; right:-13%; }
+      .footer-grid { grid-template-columns:1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero-copy h1 { font-size:55px; }
+      .hero-copy h2 { font-size:25px; padding:0 12px; }
+      .hero-actions { flex-direction:column; width:220px; margin-left:auto; margin-right:auto; }
+      .hero-frame { width:72vw; height:61vh; }
+      .stats { grid-template-columns:1fr 1fr; gap:36px 16px; }
+      .about-collage { min-height:520px; }
+      .about-photo-a { width:76%; height:75%; }
+      .about-photo-b { width:58%; height:43%; }
+      .operator { min-height:820px; }
+      .operator-copy { width:92%; }
+      .operator-person { height:54%; right:-29%; opacity:.88; }
+      .operator-note { gap:18px; }
+      .case-service, .case-kpi { min-height:350px; }
+      .people-photo { min-height:480px; }
+      .pov-item { padding:28px 0; gap:12px; }
+      .lifestyle-copy { width:93%; }
+      .lifestyle-figure { right:-36%; height:43%; }
+      .gallery-grid { display:block; }
+      .gallery-item { height:420px; margin-bottom:12px; }
+      .next-copy { width:94%; }
+      .next-figure { height:47%; right:-35%; opacity:.82; }
+      .contact-btn { width:125px; height:125px; }
+      .copyright { flex-direction:column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior:auto; }
+      *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+      .reveal, .reveal-left, .reveal-right { opacity:1 !important; transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <nav class="nav" aria-label="Điều hướng chính">
+    <a class="brand" href="#top">KOKO<i>.</i></a>
+    <div class="nav-links">
+      <a href="#profile">Profile</a>
+      <a href="#journey">Journey</a>
+      <a href="#unite">Unite Group</a>
+      <a href="#point-of-view">Point of View</a>
+      <a href="#connect">Connect</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Đổi giao diện sáng tối" title="Đổi giao diện">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </nav>
+
+  <main id="top">
+    <!-- 01 HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-word one outline-text">VISIONARY</div>
+      <div class="hero-word two outline-text">OPERATOR</div>
+      <div class="hero-frame" id="heroFrame">
+        <img src="assets/images/hero-street.webp" alt="Koko Linh trong khoảnh khắc đời thường trên phố" fetchpriority="high" />
+      </div>
+      <div class="hero-copy">
+        <p class="hero-kicker">Tổng Giám Đốc · Unite Group</p>
+        <h1>KOKO LINH<span>.</span></h1>
+        <h2>Xây hệ thống. Xây đội ngũ. Kiến tạo tăng trưởng.</h2>
+        <div class="hero-actions">
+          <a class="primary" href="#journey">Explore the Journey</a>
+          <a href="#unite">Discover Unite Group</a>
+        </div>
+      </div>
+      <div class="hero-scroll">Scroll to discover ↓</div>
+    </section>
+
+    <!-- 02 MANIFESTO -->
+    <section class="section manifesto section-rule" id="manifesto">
+      <div class="shell">
+        <p class="eyebrow reveal">Manifesto</p>
+        <p class="quote reveal">Kinh doanh không phải là bàn cờ của những con số khô khan. Đó là nghệ thuật lãnh đạo — nơi tầm nhìn, hệ thống và con người cùng tạo nên một tổ chức có khả năng phát triển lâu dài.</p>
+        <div class="stats">
+          <div class="stat reveal"><strong>2020</strong><span>Hành trình khởi nguồn</span></div>
+          <div class="stat reveal"><strong>10K+</strong><span>Căn hộ trong mạng lưới</span></div>
+          <div class="stat reveal"><strong>300+</strong><span>Quy mô đội ngũ được giới thiệu</span></div>
+          <div class="stat reveal"><strong class="wine">01</strong><span>Hệ sinh thái Unite</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 PROFILE -->
+    <section class="section section-rule" id="profile">
+      <div class="shell about-grid">
+        <div class="about-collage reveal-left">
+          <div class="about-photo-a"><img src="assets/images/executive-elegant.webp" alt="Koko Linh trong trang phục executive ngoài trời" loading="lazy" /></div>
+          <div class="about-photo-b"><img src="assets/images/event-platform.webp" alt="Koko Linh thuyết trình tại sự kiện Unite Group" loading="lazy" /></div>
+          <div class="about-index">03</div>
+        </div>
+        <div class="about-copy reveal-right">
+          <p class="eyebrow">Về Koko Linh</p>
+          <h2>Nữ lãnh đạo trẻ<br/><em class="wine">trực tiếp xây dựng hệ thống.</em></h2>
+          <p>Được biết đến với tinh thần quyết liệt và khả năng thực thi nhạy bén, Koko Linh đại diện cho hình mẫu “Visionary Operator” — không chỉ đưa ra định hướng mà còn đi sâu vào cách tổ chức vận hành, phát triển đội ngũ và xây dựng văn hóa doanh nghiệp.</p>
+          <p>Hành trình bắt đầu từ cuối năm 2020 với tên gọi Unite Home; đến tháng 03/2021, pháp nhân Unite Group chính thức hoạt động. Từ đó, hệ thống tiếp tục mở rộng theo hướng chuyên nghiệp hóa bất động sản cho thuê tại TP.HCM.</p>
+          <p>Sự khác biệt nằm ở một DNA trẻ, thực chiến và tập trung vào con người: tăng trưởng không chỉ đến từ doanh số, mà từ khả năng tạo ra những người có thể tiếp tục dẫn dắt.</p>
+          <div class="signature"><strong>Trương Cẩm Linh</strong><span>Tổng Giám Đốc · Unite Group</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 OPERATOR -->
+    <section class="section operator" id="operator">
+      <div class="operator-bg">OPERATOR</div>
+      <div class="operator-copy reveal-left">
+        <p class="eyebrow">The Operator</p>
+        <h2>Vision<br/>needs<br/><span class="wine">execution.</span></h2>
+        <p>Tầm nhìn chỉ tạo ra phương hướng. Hệ thống biến phương hướng thành thói quen vận hành. Con người biến hệ thống thành quy mô. Đó là cách một ý tưởng được chuyển thành tổ chức có khả năng tự lớn lên.</p>
+        <div class="operator-note">
+          <div><b>System</b><span>Chuẩn hóa những gì cần lặp lại.</span></div>
+          <div><b>People</b><span>Tạo môi trường để người khác lớn lên.</span></div>
+          <div><b>Scale</b><span>Tăng trưởng nhưng không đánh mất chất lượng.</span></div>
+        </div>
+      </div>
+      <img class="operator-person" src="assets/images/cutout-navy-bag.webp" alt="Koko Linh trong trang phục navy" loading="lazy" />
+    </section>
+
+    <!-- 05 HOW SHE BUILDS -->
+    <section class="section section-rule" id="how-she-builds">
+      <div class="shell">
+        <div class="how-head">
+          <div><p class="eyebrow reveal">How She Builds</p><h2 class="reveal">Vision.<br/>People.<br/><span class="wine">Execution.</span></h2></div>
+          <p class="reveal">Ba lớp tư duy tạo nên phong cách vận hành: nhìn đủ xa để biết mình đang đi đâu, xây đủ chắc để đội ngũ có thể chạy, và thực thi đủ nhanh để biến ý tưởng thành kết quả.</p>
+        </div>
+        <div class="build-grid">
+          <article class="build-card reveal"><div class="num">01</div><h3>Vision</h3><p>Không nhìn một giao dịch như một điểm kết thúc. Nhìn toàn bộ hành trình khách hàng, đội ngũ và hệ thống để xác định thứ cần được xây cho giai đoạn tiếp theo.</p></article>
+          <article class="build-card reveal"><div class="num">02</div><h3>People</h3><p>Tăng trưởng bền vững cần nhiều người có khả năng tự ra quyết định, tự chịu trách nhiệm và tiếp tục phát triển người khác — không chỉ một người giỏi đứng ở trung tâm.</p></article>
+          <article class="build-card reveal"><div class="num">03</div><h3>Execution</h3><p>Ý tưởng phải được chuyển thành quy trình, nhịp làm việc, tiêu chuẩn và dữ liệu có thể theo dõi. Khi đó, chiến lược mới thật sự đi vào vận hành hàng ngày.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 JOURNEY -->
+    <section class="journey-wrap section-rule" id="journey">
+      <div class="journey-track" id="journeyTrack">
+        <div class="journey-panel journey-title">
+          <div><p class="eyebrow">Hành Trình Kiến Tạo</p><h2>The</h2><div class="serif-line">Journey.</div><p class="muted" style="margin-top:36px;font-size:10px;letter-spacing:.22em;text-transform:uppercase">Scroll to move through time →</p></div>
+        </div>
+        <div class="journey-panel">
+          <div class="journey-media"><img src="assets/images/walk-editorial.webp" alt="Koko Linh walking editorial" loading="lazy" /></div>
+          <div class="journey-card"><div class="year">2020</div><h3>Viên gạch đầu tiên.</h3><p>Hành trình bắt đầu vào cuối tháng 10/2020 với tên gọi Unite Home — giai đoạn đặt nền móng cho cách làm bất động sản cho thuê theo hướng hệ thống hơn.</p></div>
+        </div>
+        <div class="journey-panel">
+          <div class="journey-media"><img src="assets/images/office-portrait.webp" alt="Koko Linh tại văn phòng" loading="lazy" /></div>
+          <div class="journey-card"><div class="year">2021</div><h3>Unite Group chính thức.</h3><p>Ngày 18/03/2021 là mốc hoạt động pháp lý của Công ty TNHH TMDV BĐS Unite Group — mở ra giai đoạn vận hành với cấu trúc doanh nghiệp rõ ràng hơn.</p></div>
+        </div>
+        <div class="journey-panel">
+          <div class="journey-media"><img src="assets/images/event-stage.webp" alt="Koko Linh tại sân khấu Unite Group" loading="lazy" /></div>
+          <div class="journey-card"><div class="year">2023</div><h3>Mở rộng & xây đội ngũ.</h3><p>Hệ thống tiếp tục mở rộng footprint, phát triển văn hóa đội ngũ trẻ và tăng cường các hoạt động đào tạo, vinh danh và gắn kết để tạo lực tăng trưởng từ bên trong.</p></div>
+        </div>
+        <div class="journey-panel">
+          <div class="journey-media"><img src="assets/images/event-audience.webp" alt="Sự kiện nội bộ Unite Group với Koko Linh trên sân khấu" loading="lazy" /></div>
+          <div class="journey-card"><div class="year">NOW</div><h3>Một tầm vóc mới.</h3><p>Unite Group được giới thiệu với mạng lưới hơn 10.000 căn hộ và quy mô hơn 300 nhân sự; đồng thời mở thêm những chương mới như UN1TE ONE và các quan hệ hợp tác chiến lược.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 CASE STUDY -->
+    <section class="section section-rule" id="unite">
+      <div class="shell">
+        <div class="case-head">
+          <div><p class="eyebrow reveal">Largest Operating Proof</p><h2 class="reveal">UNITE<br/><span class="outline-text">GROUP.</span></h2></div>
+          <p class="reveal">Một case study về cách xây mạng lưới vận hành bất động sản cho thuê, phát triển đội ngũ và biến culture thành một phần của hệ thống tăng trưởng.</p>
+        </div>
+        <div class="case-grid">
+          <article class="case-card case-service reveal">
+            <img src="assets/images/event-speaker.webp" alt="Koko Linh chia sẻ tại hội nghị Unite Group" loading="lazy" />
+            <span class="tag">Core Business</span><h3>Bất động sản cho thuê</h3><p style="color:rgba(255,255,255,.78)">Kết nối chủ nhà và khách thuê thông qua giỏ hàng, quy trình bán hàng và hệ thống vận hành được chuẩn hóa theo quy mô.</p>
+          </article>
+          <article class="case-card case-kpi reveal"><span class="tag" style="color:#fff">Operating Scale</span><div><strong>10K+</strong><p>Căn hộ / inventory được các nguồn giới thiệu doanh nghiệp ghi nhận trong mạng lưới.</p></div></article>
+          <article class="case-card case-small reveal"><span class="tag">People System</span><h3>300+ People</h3><p>Đội ngũ được xây quanh đào tạo, nhịp vận hành, leader pipeline và cơ chế ghi nhận thành tích.</p></article>
+          <article class="case-card case-small reveal"><span class="tag">Strategic Partnership</span><h3>Batdongsan.com.vn</h3><p>Một lớp proof bên ngoài cho định hướng kết nối nền tảng, nguồn dữ liệu và thị trường bất động sản.</p></article>
+          <article class="case-card case-small reveal"><span class="tag">New Chapter</span><h3>UN1TE ONE</h3><p>Dấu mốc mở ra một chương vận hành mới và tham vọng mở rộng quy mô theo hệ thống.</p></article>
+          <article class="case-card case-wide reveal"><img src="assets/images/event-audience.webp" alt="Toàn cảnh hội nghị Unite Group" loading="lazy"/><div><span class="tag">Culture as Infrastructure</span><h3>Không chỉ xây doanh số. Xây một tổ chức có thể tiếp tục tạo ra người dẫn dắt.</h3></div></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 PEOPLE -->
+    <section class="section people section-rule" id="people">
+      <div class="shell people-grid">
+        <div class="people-copy reveal-left">
+          <p class="eyebrow">People Leadership</p>
+          <h2>Growth<br/>through<br/><span class="wine">people.</span></h2>
+          <p class="lead">“Một tổ chức chỉ thật sự lớn lên khi những người bên trong nó cũng lớn lên.”</p>
+          <p>Đào tạo, vinh danh, team building và những cuộc đối thoại trực tiếp không phải phần trang trí của văn hóa. Chúng là cách tổ chức truyền tiêu chuẩn, tạo động lực và biến giá trị thành hành vi có thể lặp lại.</p>
+        </div>
+        <div class="people-photo reveal-right">
+          <div class="main"><img src="assets/images/event-stage.webp" alt="Koko Linh phát biểu trên sân khấu" loading="lazy" /></div>
+          <img class="float" src="assets/images/office-portrait-alt.webp" alt="Portrait Koko Linh tại văn phòng" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 POV -->
+    <section class="section pov" id="point-of-view">
+      <div class="shell">
+        <p class="eyebrow reveal">Point of View</p>
+        <div class="pov-head"><h2 class="reveal">WHAT<br/>I BELIEVE.</h2><p class="reveal">Một website cá nhân không chỉ cần kể “đã làm gì”, mà phải cho thấy cách một người nhìn công việc, con người và tăng trưởng.</p></div>
+        <div class="pov-list">
+          <div class="pov-item reveal"><span class="idx">01</span><h3>“Đừng đi làm chỉ để kiếm tiền — trước tiên hãy để mình đáng tiền.”</h3><span>Growth mindset</span></div>
+          <div class="pov-item reveal"><span class="idx">02</span><h3>Hệ thống tốt không thay thế con người giỏi. Nó giúp người giỏi tạo ra kết quả ổn định hơn.</h3><span>Systems</span></div>
+          <div class="pov-item reveal"><span class="idx">03</span><h3>Quy mô không phải là lớn hơn bằng mọi giá. Quy mô là tăng trưởng mà vẫn giữ được tiêu chuẩn.</h3><span>Scale</span></div>
+          <div class="pov-item reveal"><span class="idx">04</span><h3>Lãnh đạo không phải đứng trước đội ngũ. Là tạo ra thêm những người có thể đứng lên dẫn dắt.</h3><span>Leadership</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 LIFESTYLE -->
+    <section class="section lifestyle" id="beyond-office">
+      <div class="lifestyle-photo"><img src="assets/images/executive-elegant.webp" alt="Koko Linh lifestyle editorial" loading="lazy" /></div>
+      <div class="shell">
+        <div class="lifestyle-copy reveal-left">
+          <p class="eyebrow">Beyond The Office</p>
+          <h2>The human<br/><span class="wine">side.</span></h2>
+          <p>Thương hiệu cá nhân không chỉ tồn tại trong phòng họp hay trên sân khấu. Những khoảnh khắc đời thường — một bước đi, một góc thành phố, một lựa chọn phong cách — giúp bức chân dung lãnh đạo trở nên gần, thật và có cá tính hơn.</p>
+        </div>
+      </div>
+      <img class="lifestyle-figure" src="assets/images/cutout-beige.webp" alt="Koko Linh trong trang phục beige" loading="lazy" />
+    </section>
+
+    <!-- 11 GALLERY -->
+    <section class="section section-rule" id="moments">
+      <div class="shell">
+        <div class="gallery-head"><div><p class="eyebrow reveal">Selected Moments</p><h2 class="reveal">Work.<br/>Life.<br/><span class="wine">Motion.</span></h2></div><p class="reveal">Từ office portrait đến walking shot và sân khấu — cùng một nhân vật, nhưng nhiều lớp năng lượng khác nhau.</p></div>
+        <div class="gallery-grid">
+          <figure class="gallery-item reveal"><img src="assets/images/lean-editorial.webp" alt="Koko Linh editorial dựa tường" loading="lazy" /></figure>
+          <figure class="gallery-item reveal"><img src="assets/images/office-portrait.webp" alt="Koko Linh office portrait" loading="lazy" /></figure>
+          <figure class="gallery-item reveal"><img src="assets/images/walk-editorial.webp" alt="Koko Linh walking" loading="lazy" /></figure>
+          <figure class="gallery-item reveal"><img src="assets/images/event-platform.webp" alt="Koko Linh speaking" loading="lazy" /></figure>
+          <figure class="gallery-item reveal"><img src="assets/images/executive-elegant.webp" alt="Koko Linh executive lifestyle" loading="lazy" /></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 NEXT -->
+    <section class="section next" id="next-chapter">
+      <div class="next-word">NEXT</div>
+      <div class="shell">
+        <div class="next-copy reveal-left">
+          <p class="eyebrow">The Next Chapter</p>
+          <h2>Building<br/>what people<br/><span class="wine">can grow with.</span></h2>
+          <blockquote>Không chỉ xây một doanh nghiệp lớn hơn. Xây những hệ thống, đội ngũ và cơ hội đủ tốt để nhiều người có thể tiếp tục phát triển bên trong đó.</blockquote>
+          <p>Chương tiếp theo không nhất thiết cần được định nghĩa bằng một con số. Nó được định nghĩa bằng khả năng tạo ra nhiều không gian hơn cho tăng trưởng — của khách hàng, của đội ngũ và của chính tổ chức.</p>
+        </div>
+      </div>
+      <img class="next-figure" src="assets/images/cutout-navy-lean.webp" alt="Koko Linh editorial cutout" loading="lazy" />
+    </section>
+
+    <!-- 13 CONNECT -->
+    <section class="section contact" id="connect">
+      <div class="contact-inner shell">
+        <p class="eyebrow" style="justify-content:center;color:#ff5e71">Partnership · Speaking · Business</p>
+        <h2>Hãy kết nối.</h2>
+        <p>Sự hợp tác tốt thường bắt đầu từ một cuộc trò chuyện rõ ràng: về điều đang được xây, vấn đề cần giải quyết và giá trị hai bên có thể cùng tạo ra.</p>
+        <a class="contact-btn" href="mailto:ceo@unitegroup.com.vn">Liên hệ</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <div class="footer-grid">
+        <div><div class="logo">KOKO<span class="wine">.</span></div><p style="max-width:360px;margin-top:18px">The Visionary Operator — Executive Creative Portfolio.</p></div>
+        <div><span class="label">Navigate</span><p><a href="#profile">Profile</a><br/><a href="#journey">Journey</a><br/><a href="#unite">Unite Group</a><br/><a href="#point-of-view">Point of View</a></p></div>
+        <div><span class="label">Contact</span><p><a href="mailto:ceo@unitegroup.com.vn">ceo@unitegroup.com.vn</a><br/>Ho Chi Minh City, Vietnam</p></div>
+      </div>
+      <div class="copyright"><span>© 2026 Koko Linh. All rights reserved.</span><span>Designed as an Executive Creative × Cinematic Editorial portfolio.</span></div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const root = document.documentElement;
+      const toggle = document.getElementById('themeToggle');
+      const stored = localStorage.getItem('koko-theme');
+      if (stored === 'light' || stored === 'dark') root.dataset.theme = stored;
+      toggle.addEventListener('click', () => {
+        root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('koko-theme', root.dataset.theme);
+      });
+
+      const progress = document.getElementById('progress');
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+      };
+      addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+
+      // Static fallback when motion libraries are unavailable.
+      const revealAll = () => document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { revealAll(); return; }
+
+      if (!window.gsap || !window.ScrollTrigger) {
+        const io = new IntersectionObserver(entries => entries.forEach(e => {
+          if (e.isIntersecting) { e.target.style.opacity = 1; e.target.style.transform = 'none'; io.unobserve(e.target); }
+        }), { threshold: .12 });
+        document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => io.observe(el));
+        return;
+      }
+
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.utils.toArray('.reveal').forEach(el => gsap.to(el, { opacity:1, y:0, duration:.85, ease:'power3.out', scrollTrigger:{ trigger:el, start:'top 86%' } }));
+      gsap.utils.toArray('.reveal-left').forEach(el => gsap.to(el, { opacity:1, x:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:el, start:'top 82%' } }));
+      gsap.utils.toArray('.reveal-right').forEach(el => gsap.to(el, { opacity:1, x:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:el, start:'top 82%' } }));
+
+      const heroFrame = document.getElementById('heroFrame');
+      gsap.timeline({ scrollTrigger:{ trigger:'#hero', start:'top top', end:'+=90%', scrub:1, pin:true } })
+        .to(heroFrame, { width:'100vw', height:'100vh', borderRadius:0, ease:'none' }, 0)
+        .to('#heroFrame img', { scale:1, ease:'none' }, 0)
+        .to('.hero-copy', { y:-110, opacity:0, ease:'none' }, 0)
+        .to('.hero-word.one', { x:'-12vw', ease:'none' }, 0)
+        .to('.hero-word.two', { x:'12vw', ease:'none' }, 0);
+
+      if (innerWidth > 980) {
+        const track = document.getElementById('journeyTrack');
+        const getAmount = () => Math.max(0, track.scrollWidth - innerWidth);
+        gsap.to(track, {
+          x: () => -getAmount(),
+          ease:'none',
+          scrollTrigger:{ trigger:'#journey', start:'top top', end:() => `+=${getAmount()}`, pin:true, scrub:1, invalidateOnRefresh:true }
+        });
+      }
+
+      gsap.to('.operator-person', { yPercent:-5, ease:'none', scrollTrigger:{ trigger:'.operator', start:'top bottom', end:'bottom top', scrub:1 } });
+      gsap.to('.lifestyle-figure', { yPercent:-7, ease:'none', scrollTrigger:{ trigger:'.lifestyle', start:'top bottom', end:'bottom top', scrub:1 } });
+      gsap.to('.next-figure', { yPercent:-6, ease:'none', scrollTrigger:{ trigger:'.next', start:'top bottom', end:'bottom top', scrub:1 } });
+    });
+  </script>
+</body>
+</html>
