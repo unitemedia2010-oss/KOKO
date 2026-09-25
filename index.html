@@ -61,7 +61,10 @@
     }
     ::selection { background: var(--wine); color: #fff; }
     a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--text); outline-offset: 5px; }
+    section[id] { scroll-margin-top: 88px; }
     img { display: block; max-width: 100%; }
+    main { overflow-x: clip; }
     button { font: inherit; }
     .shell { width: min(1280px, calc(100% - 48px)); margin: 0 auto; }
     .section { position: relative; padding: 140px 0; }
@@ -82,37 +85,43 @@
       position: fixed; inset: 0 0 auto 0; z-index: 80;
       display: flex; align-items: center; justify-content: space-between;
       padding: 25px 34px;
-      mix-blend-mode: difference; color: #fff;
+      color: var(--text); background: color-mix(in srgb, var(--bg) 94%, transparent);
+      border-bottom: 1px solid var(--line); backdrop-filter: blur(12px);
       pointer-events: none;
     }
     .brand, .nav-links, .theme-toggle { pointer-events: auto; }
     .brand { font: 800 18px/1 var(--display); letter-spacing: .26em; }
     .brand i { color: #ff2943; font-style: normal; }
     .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { font-size: 10px; text-transform: uppercase; letter-spacing: .22em; opacity: .55; transition: opacity .2s ease; }
+    .nav-links a { font-size: 10px; text-transform: uppercase; letter-spacing: .16em; opacity: .8; transition: opacity .2s ease; }
     .nav-links a:hover { opacity: 1; }
-    .theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,.3); background: rgba(10,10,10,.2); color: white; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(10px); }
+    .theme-toggle { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; color: var(--text); display: grid; place-items: center; cursor: pointer; }
     .theme-toggle svg { width: 16px; height: 16px; }
     .progress { position: fixed; top: 0; left: 0; width: 100%; height: 2px; z-index: 100; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg,var(--wine),#ed2440); }
 
     /* hero */
-    .hero { min-height: 100svh; position: relative; overflow: hidden; display: grid; place-items: center; }
-    .hero-word { position: absolute; font: 900 clamp(86px, 14vw, 220px)/.78 var(--display); letter-spacing: -.07em; white-space: nowrap; opacity: .24; pointer-events: none; }
-    .hero-word.one { top: 15%; left: -4%; }
-    .hero-word.two { bottom: 12%; right: -5%; }
-    .hero-frame { position: absolute; width: min(32vw, 430px); height: min(74vh, 650px); border-radius: 4px; overflow: hidden; box-shadow: var(--shadow); z-index: 1; }
-    .hero-frame img { width: 100%; height: 100%; object-fit: cover; object-position: 52% 45%; filter: saturate(.78) contrast(1.03); transform: scale(1.05); }
-    .hero-frame::after { content:""; position:absolute; inset:0; background: linear-gradient(180deg,transparent 55%,rgba(0,0,0,.55)); }
-    .hero-copy { position: relative; z-index: 3; text-align: center; width: min(1000px, 92vw); color: #fff; text-shadow: 0 2px 35px rgba(0,0,0,.35); mix-blend-mode: difference; }
-    .hero-kicker { margin: 0 0 22px; font-size: 10px; letter-spacing: .48em; text-transform: uppercase; opacity: .65; }
-    .hero-copy h1 { margin: 0; font: 900 clamp(60px, 9vw, 138px)/.82 var(--display); letter-spacing: -.065em; text-transform: uppercase; }
-    .hero-copy h1 span { color: #ff2741; }
-    .hero-copy h2 { margin: 26px auto 0; font: italic 500 clamp(25px, 3vw, 42px)/1.1 var(--serif); max-width: 900px; }
-    .hero-actions { display: flex; justify-content: center; gap: 12px; margin-top: 36px; mix-blend-mode: normal; }
-    .hero-actions a { border: 1px solid rgba(255,255,255,.45); background: rgba(0,0,0,.2); backdrop-filter: blur(10px); padding: 13px 18px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; transition: .25s ease; }
-    .hero-actions a.primary { background: var(--wine); border-color: var(--wine); }
-    .hero-actions a:hover { transform: translateY(-2px); background: #fff; color: #111; border-color:#fff; }
-    .hero-scroll { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); z-index:4; font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:#fff; opacity:.55; }
+    .hero { min-height: 100svh; padding: 132px 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 44px; }
+    .hero-layout { width: min(1160px, calc(100% - 96px)); margin: auto; display: grid; grid-template-columns: 1.12fr 1fr; gap: clamp(40px, 6vw, 90px); align-items: center; }
+    .hero-copy { min-width: 0; }
+    .hero-kicker { margin: 0 0 30px; color: var(--muted); font-size: 11px; line-height: 1.7; letter-spacing: .2em; text-transform: uppercase; }
+    .hero-kicker::before { content: ""; display: inline-block; width: 26px; height: 2px; margin: 0 12px 3px 0; background: var(--wine); }
+    .hero-copy h1 { margin: 0; font: 800 clamp(76px, 8.5vw, 126px)/.92 var(--display); letter-spacing: -.065em; }
+    .hero-copy h1 span { color: #e3243e; }
+    .hero-message { margin: 32px 0 0; font: 500 clamp(28px, 2.7vw, 39px)/1.28 var(--serif); letter-spacing: -.015em; }
+    .hero-message span { display: block; }
+    .hero-message span:last-child { color: var(--muted); }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 24px; margin-top: 32px; }
+    .hero-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 48px; font-size: 12px; font-weight: 500; transition: background .2s ease, color .2s ease; }
+    .hero-actions a.primary { padding: 15px 20px; background: var(--wine); color: #fff; }
+    .hero-actions a.primary:hover { background: var(--wine-2); }
+    .hero-actions a.secondary { border-bottom: 1px solid var(--line-strong); }
+    .hero-actions a.secondary:hover { color: var(--wine); }
+    .hero-portrait { margin: 0; min-width: 0; }
+    .hero-frame { aspect-ratio: 4 / 5; max-height: 580px; overflow: hidden; background: var(--card); }
+    .hero-frame img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 46%; }
+    .hero-portrait figcaption { display: flex; justify-content: space-between; gap: 16px; padding-top: 16px; font-size: 9px; line-height: 1.6; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+    .hero-footer { width: min(1160px, calc(100% - 96px)); margin: 0 auto; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font-size: 9px; line-height: 1.6; letter-spacing: .18em; text-transform: uppercase; }
+    .hero-scroll { display: inline-flex; align-items: center; gap: 16px; }
 
     /* manifesto */
     .manifesto .quote { margin: 0; font: 500 clamp(38px, 5.5vw, 74px)/1.12 var(--serif); max-width: 1120px; letter-spacing: -.02em; }
@@ -272,8 +281,13 @@
       .section { padding:100px 0; }
       .nav { padding:20px 18px; }
       .nav-links { display:none; }
-      .hero-frame { width:min(65vw,380px); height:64vh; }
-      .hero-word { opacity:.16; }
+      .hero { padding-top: 116px; gap: 36px; }
+      .hero-layout { width:calc(100% - 48px); gap:32px; }
+      .hero-copy h1 { font-size:clamp(64px,10vw,90px); }
+      .hero-kicker { font-size:9px; letter-spacing:.12em; margin-bottom:24px; }
+      .hero-message { font-size:29px; margin-top:24px; }
+      .hero-actions { gap:8px 20px; margin-top:24px; }
+      .hero-footer { width:calc(100% - 48px); }
       .stats { grid-template-columns:repeat(2,1fr); }
       .about-grid, .people-grid { grid-template-columns:1fr; gap:54px; }
       .about-collage { min-height:640px; }
@@ -311,10 +325,16 @@
       .footer-grid { grid-template-columns:1fr; }
     }
     @media (max-width: 620px) {
-      .hero-copy h1 { font-size:55px; }
-      .hero-copy h2 { font-size:25px; padding:0 12px; }
-      .hero-actions { flex-direction:column; width:220px; margin-left:auto; margin-right:auto; }
-      .hero-frame { width:72vw; height:61vh; }
+      .hero { padding-top:112px; gap:28px; }
+      .hero-layout { grid-template-columns:1fr; gap:36px; width:calc(100% - 40px); }
+      .hero-copy h1 { font-size:clamp(76px,20vw,116px); }
+      .hero-kicker { margin-bottom:22px; font-size:10px; letter-spacing:.1em; }
+      .hero-message { font-size:clamp(23px, 7.2vw, 30px); }
+      .hero-actions { gap:12px 20px; }
+      .hero-actions a { font-size:11px; }
+      .hero-actions a.primary { padding:14px 16px; }
+      .hero-frame { aspect-ratio:4 / 4.5; max-height:none; }
+      .hero-footer { width:calc(100% - 40px); font-size:8px; letter-spacing:.1em; }
       .stats { grid-template-columns:1fr 1fr; gap:36px 16px; }
       .about-collage { min-height:520px; }
       .about-photo-a { width:76%; height:75%; }
@@ -362,21 +382,24 @@
   <main id="top">
     <!-- 01 HERO -->
     <section class="hero" id="hero">
-      <div class="hero-word one outline-text">VISIONARY</div>
-      <div class="hero-word two outline-text">OPERATOR</div>
-      <div class="hero-frame" id="heroFrame">
-        <img src="assets/images/hero-street.webp" alt="Koko Linh trong khoảnh khắc đời thường trên phố" fetchpriority="high" />
-      </div>
-      <div class="hero-copy">
-        <p class="hero-kicker">Tổng Giám Đốc · Unite Group</p>
-        <h1>KOKO LINH<span>.</span></h1>
-        <h2>Xây hệ thống. Xây đội ngũ. Kiến tạo tăng trưởng.</h2>
-        <div class="hero-actions">
-          <a class="primary" href="#journey">Explore the Journey</a>
-          <a href="#unite">Discover Unite Group</a>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="hero-kicker">Tổng Giám Đốc · Unite Group</p>
+          <h1>KOKO<br/>LINH<span>.</span></h1>
+          <p class="hero-message"><span>Xây hệ thống. Xây đội ngũ.</span><span>Kiến tạo tăng trưởng.</span></p>
+          <div class="hero-actions">
+            <a class="primary" href="#journey">Khám phá hành trình <span aria-hidden="true">↗</span></a>
+            <a class="secondary" href="#unite">Về Unite Group <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
+        <figure class="hero-portrait">
+          <div class="hero-frame">
+            <img src="assets/images/office-portrait.webp" alt="Koko Linh trong trang phục vest tại văn phòng" width="1066" height="1600" fetchpriority="high" />
+          </div>
+          <figcaption><span>Koko Linh</span><span>The Visionary Operator</span></figcaption>
+        </figure>
       </div>
-      <div class="hero-scroll">Scroll to discover ↓</div>
+      <div class="hero-footer"><span>Tầm nhìn · Con người · Thực thi</span><a class="hero-scroll" href="#manifesto">Khám phá tiếp <span aria-hidden="true">↓</span></a></div>
     </section>
 
     <!-- 02 MANIFESTO -->
@@ -521,7 +544,7 @@
 
     <!-- 10 LIFESTYLE -->
     <section class="section lifestyle" id="beyond-office">
-      <div class="lifestyle-photo"><img src="assets/images/executive-elegant.webp" alt="Koko Linh lifestyle editorial" loading="lazy" /></div>
+      <div class="lifestyle-photo"><img src="assets/images/hero-street.webp" alt="Koko Linh trong khoảnh khắc đời thường trên phố" loading="lazy" /></div>
       <div class="shell">
         <div class="lifestyle-copy reveal-left">
           <p class="eyebrow">Beyond The Office</p>
@@ -618,15 +641,7 @@
       gsap.utils.toArray('.reveal-left').forEach(el => gsap.to(el, { opacity:1, x:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:el, start:'top 82%' } }));
       gsap.utils.toArray('.reveal-right').forEach(el => gsap.to(el, { opacity:1, x:0, duration:1, ease:'power3.out', scrollTrigger:{ trigger:el, start:'top 82%' } }));
 
-      const heroFrame = document.getElementById('heroFrame');
-      gsap.timeline({ scrollTrigger:{ trigger:'#hero', start:'top top', end:'+=90%', scrub:1, pin:true } })
-        .to(heroFrame, { width:'100vw', height:'100vh', borderRadius:0, ease:'none' }, 0)
-        .to('#heroFrame img', { scale:1, ease:'none' }, 0)
-        .to('.hero-copy', { y:-110, opacity:0, ease:'none' }, 0)
-        .to('.hero-word.one', { x:'-12vw', ease:'none' }, 0)
-        .to('.hero-word.two', { x:'12vw', ease:'none' }, 0);
-
-      if (innerWidth > 980) {
+      gsap.matchMedia().add('(min-width: 981px)', () => {
         const track = document.getElementById('journeyTrack');
         const getAmount = () => Math.max(0, track.scrollWidth - innerWidth);
         gsap.to(track, {
@@ -634,7 +649,7 @@
           ease:'none',
           scrollTrigger:{ trigger:'#journey', start:'top top', end:() => `+=${getAmount()}`, pin:true, scrub:1, invalidateOnRefresh:true }
         });
-      }
+      });
 
       gsap.to('.operator-person', { yPercent:-5, ease:'none', scrollTrigger:{ trigger:'.operator', start:'top bottom', end:'bottom top', scrub:1 } });
       gsap.to('.lifestyle-figure', { yPercent:-7, ease:'none', scrollTrigger:{ trigger:'.lifestyle', start:'top bottom', end:'bottom top', scrub:1 } });

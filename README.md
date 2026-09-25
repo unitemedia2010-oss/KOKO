@@ -2,6 +2,10 @@
 
 Static website ready for **GitHub Pages**. No build step is required.
 
+Current repository: `unitemedia2010-oss/KOKO`. Pages publishes `main` from `/`.
+See [hero refresh and verification](docs/hero-refresh.md) and
+[custom domain setup](docs/custom-domain.md).
+
 ## Deploy to GitHub Pages
 
 1. Create a new GitHub repository, for example `koko-linh-portfolio`.
