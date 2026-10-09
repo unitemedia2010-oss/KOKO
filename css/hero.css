@@ -1,0 +1,221 @@
+/* ==========================================================================
+   HERO — HIỆU ỨNG "CỔNG MỞ"
+   ==========================================================================
+   Khi cuộn xuống, hai tấm nền ở hai bên trượt ra, lộ ảnh ở giữa. Nhìn như
+   một cánh cổng đang mở ra.
+
+   CÁCH LÀM
+     .portal         cao 250vh — tạo "đà dài" để hiệu ứng có chỗ diễn ra
+     .portal-stage   position: sticky, cao 100vh — đứng yên giữa màn hình
+     .portal-panel   hai tấm nền, JS dịch chúng theo tỉ lệ cuộn
+     Ảnh phóng to nhẹ rồi thu lại, tạo cảm giác đi sâu vào khung hình
+
+   AN TOÀN
+     Nếu JavaScript không chạy, .portal-panel vẫn ở vị trí mặc định và
+     ảnh vẫn hiện ở giữa. Trang KHÔNG BAO GIỜ trắng.
+     Người dùng bật prefers-reduced-motion sẽ không có hiệu ứng trượt,
+     và phần cao dài cũng được rút lại còn 100vh.
+   ========================================================================== */
+
+.portal {
+  /* Đà dài cho hiệu ứng. Giảm trên mobile để không phải cuộn quá xa. */
+  height: 250vh;
+  position: relative;
+}
+
+.portal-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+}
+
+/* --- Ảnh nền ---
+   Dùng ảnh local thay vì Unsplash, để trang không phụ thuộc bên ngoài.
+   scale lớn hơn 1 để khi ảnh thu nhỏ không lộ viền trống ở góc. */
+.portal-image {
+  position: absolute;
+  inset: 0;
+  /* Đường dẫn có dấu / ở đầu để tính từ gốc trang, không tính từ thư mục
+     css/. Nếu không có dấu /, trình duyệt sẽ tìm ở css/assets/... và trả 404. */
+  background-image: url("/assets/images/executive-elegant.webp");
+  background-position: center 38%;
+  background-size: cover;
+  transform: scale(1.16);
+  z-index: 0;
+}
+
+/* Lớp phủ hai màu hổ phách + teal, dùng blend mode overlay.
+   Ban đầu opacity 0, JS tăng dần khi cuộn. */
+.portal-duotone {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, var(--amber), var(--teal));
+  mix-blend-mode: overlay;
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Làm tối viền ngoài, giữ chữ ở giữa luôn nổi bật.
+   Dùng hai lớp:
+     - lớp trong tối nhẹ đều ở vùng chữ
+     - lớp ngoài tối dần ra viền
+   Nếu chỉ có lớp ngoài, phụ đề "Xây hệ thống..." rơi đúng vùng sáng nhất
+   của ảnh nên sẽ chìm, không đọc được. */
+.portal-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 62% 46% at 50% 50%, rgba(10,12,14,.7), rgba(10,12,14,0) 100%),
+    radial-gradient(ellipse at center, transparent 6%, rgba(10,12,14,.9) 98%);
+  z-index: 2;
+}
+
+/* Hai tấm nền trượt ra. will-change giúp chuyển động mượt hơn trên mobile. */
+.portal-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 51%;
+  background: var(--bg);
+  z-index: 3;
+  will-change: transform;
+}
+.portal-panel.left { left: 0; }
+.portal-panel.right { right: 0; }
+
+/* Hai chấm sáng trôi theo, tạo chiều sâu */
+.portal-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--amber);
+  box-shadow: 0 0 16px var(--amber);
+  z-index: 5;
+  will-change: transform;
+}
+.portal-dot.a { left: 50%; top: 50%; }
+.portal-dot.b { right: 50%; top: 50%; background: var(--teal); box-shadow: 0 0 16px var(--teal); }
+
+/* --- Chữ lớn ở giữa --- */
+
+/* h1 chi danh cho trinh doc man hinh va cong cu tim kiem, nguoi dung khong
+   nhin thay. Phan nhin that la .portal-word .word ben duoi. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.portal-word {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  pointer-events: none;
+}
+.portal-word .word {
+  display: block;
+  font-family: var(--display);
+  font-weight: 800;
+  /* Cỡ chữ tính theo chiều rộng khung, không phải theo viewport,
+     để không tràn ra ngoài trên màn hình hẹp. */
+  font-size: clamp(3rem, 9vw, 9rem);
+  line-height: .9;
+  letter-spacing: -.01em;
+  will-change: transform, letter-spacing;
+}
+/* Hai dòng KOKO / LINH xếp cạnh nhau như bản mẫu gốc */
+.portal-word .word .fit-line { display: inline-block; width: auto; }
+.portal-word .sub {
+  display: block;
+  margin-top: 22px;
+  max-width: 580px;
+  font-family: var(--sans);
+  font-size: clamp(.58rem, 1vw, .85rem);
+  line-height: 1.7;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--soft, #a3aaad);
+}
+
+/* Ghi chú ở 4 góc */
+.portal-note {
+  position: absolute;
+  z-index: 5;
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.7;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.portal-note.tl { top: 92px; left: 34px; }
+.portal-note.tr { top: 92px; right: 34px; text-align: right; }
+.portal-note.bl { bottom: 30px; left: 34px; }
+.portal-note.br { bottom: 30px; right: 34px; }
+.portal-note .teal { color: var(--teal-text); }
+.portal-note .amber { color: var(--amber-text); }
+
+/* Nút bấm, đặt dưới chữ lớn */
+.portal-cta {
+  position: absolute;
+  z-index: 6;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: min(92%, 560px);
+}
+
+/* Khi người dùng bật giảm chuyển động: bỏ hẳn đà dài, không trượt gì */
+@media (prefers-reduced-motion: reduce) {
+  .portal { height: auto; }
+  .portal-panel { display: none; }
+  .portal-duotone { opacity: .1; }
+  .portal-stage { position: relative; padding: 140px 0 120px; height: auto; }
+  .portal-word .word { font-size: clamp(2.6rem, 8vw, 6rem); }
+  .portal-cta { position: static; transform: none; margin-top: 34px; }
+  .portal-note { display: none; }
+}
+
+/* --- Màn hình hẹp --- */
+@media (max-width: 980px) {
+  .portal { height: 210vh; }
+  .portal-panel { width: 52%; }
+  .portal-note.tl, .portal-note.tr { top: 84px; }
+  .portal-note.tl { left: 20px; }
+  .portal-note.tr { right: 20px; }
+  .portal-note.bl { left: 20px; }
+  .portal-note.br { right: 20px; }
+  .portal-cta { bottom: 64px; }
+}
+
+@media (max-width: 620px) {
+  .portal { height: 180vh; }
+  .portal-word { padding: 0 16px; }
+  .portal-word .word { font-size: clamp(2.4rem, 13vw, 4.4rem); }
+  .portal-word .sub { font-size: .58rem; letter-spacing: .14em; margin-top: 18px; }
+  .portal-note.tr, .portal-note.bl { display: none; }
+  .portal-note.tl { top: 80px; left: 16px; }
+  .portal-note.br { right: 16px; bottom: 22px; }
+  .portal-cta { bottom: 58px; gap: 12px; }
+}
