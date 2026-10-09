@@ -306,8 +306,9 @@
      ===================================================================== */
   (function initParallax() {
     if (!window.gsap || !window.ScrollTrigger || reduceMotion.matches) return;
+    /* #beyond-office khong con anh lop — anh nen do da co san mot nguoi,
+       dat them anh len se thanh hai nguoi chong nhau. */
     [['#operator', '.operator-person', -5],
-     ['#beyond-office', '.lifestyle-figure', -7],
      ['#next-chapter', '.next-figure', -6]].forEach(function (row) {
       var sel = row[0], target = row[1], amt = row[2];
       if (!document.querySelector(sel) || !document.querySelector(target)) return;

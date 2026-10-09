@@ -667,17 +667,22 @@ html[data-theme="light"] .operator-copy p { color: #5e5556; }
 /* ==========================================================================
    16. LIFESTYLE
    ========================================================================== */
+/* Không còn .lifestyle-figure ở đây.
+   Ảnh nền hero-street.webp đã có sẵn một người mặc đen ở góc phải. Khi đặt
+   thêm ảnh người lên trên, hai người chồng lên nhau và trông rối. Nay chỉ
+   dùng ảnh nền, nên ảnh được nới rộng và chỉnh lại khung cắt. */
 .lifestyle { min-height: 900px; display: flex; align-items: center; overflow: hidden; background: var(--bg-soft); }
-.lifestyle-photo { position: absolute; inset: 0 0 0 48%; overflow: hidden; }
-.lifestyle-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.lifestyle-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-soft), transparent 35%); }
+.lifestyle-photo { position: absolute; inset: 0 0 0 40%; overflow: hidden; }
+.lifestyle-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 42%; }
+.lifestyle-photo::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, var(--bg-soft) 0%, transparent 42%),
+    linear-gradient(0deg, rgba(0,0,0,.34), transparent 45%);
+}
 .lifestyle-copy { position: relative; z-index: 2; max-width: 610px; }
 .lifestyle-copy h2 { margin: 0; font: 900 clamp(58px, 8vw, 112px)/.82 var(--display); letter-spacing: -.07em; text-transform: uppercase; }
 .lifestyle-copy p { color: var(--muted); line-height: 1.85; font-size: 15px; max-width: 520px; text-wrap: pretty; }
-.lifestyle-figure {
-  position: absolute; height: 87%; right: 4%; bottom: 0; z-index: 3;
-  filter: drop-shadow(0 25px 35px rgba(0,0,0,.32));
-}
 
 /* ==========================================================================
    17. GALLERY
@@ -809,10 +814,14 @@ footer .label { display: block; color: #ccc6c0; font-size: 9px; letter-spacing: 
   .pov-item { grid-template-columns: 45px 1fr; }
   .pov-item span:last-child { display: none; }
 
-  .lifestyle { min-height: 900px; align-items: flex-start; padding-top: 100px; }
-  .lifestyle-photo { inset: 42% 0 0 0; }
-  .lifestyle-photo::after { background: linear-gradient(180deg, var(--bg-soft), transparent 35%); }
-  .lifestyle-figure { height: 52%; right: -17%; }
+  .lifestyle { min-height: 820px; align-items: flex-start; padding-top: 100px; }
+  .lifestyle-photo { inset: 40% 0 0 0; }
+  .lifestyle-photo img { object-position: 62% 38%; }
+  .lifestyle-photo::after {
+    background:
+      linear-gradient(180deg, var(--bg-soft) 0%, transparent 45%),
+      linear-gradient(0deg, rgba(0,0,0,.3), transparent 40%);
+  }
   .lifestyle-copy { width: 78%; }
 
   .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 420px 260px 260px; }
@@ -848,8 +857,8 @@ footer .label { display: block; color: #ccc6c0; font-size: 9px; letter-spacing: 
   .case-service, .case-kpi { min-height: 350px; }
   .people-photo { min-height: 480px; }
   .pov-item { padding: 28px 0; gap: 12px; }
+  .lifestyle { min-height: 760px; }
   .lifestyle-copy { width: 93%; }
-  .lifestyle-figure { right: -36%; height: 43%; }
   .gallery-grid { display: block; }
   .gallery-item { height: 420px; margin-bottom: 12px; }
   .next-copy { width: 94%; }
