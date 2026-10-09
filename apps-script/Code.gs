@@ -97,33 +97,82 @@ function setupSheets() { return setupKokoSheets(); }
  *  ENTRY POINT — DO GET
  * ========================================================================= */
 
+/**
+ * doGet — trang quản trị gọi vào đây.
+ *
+ * HỖ TRỢ JSONP
+ *   Trang admin nằm trên linhtruong.vn, khác origin với script.google.com,
+ *   nên fetch thường bị chặn CORS. Cách thoát là JSONP: trang tạo một hàm
+ *   toàn cục rồi nhờ Apps Script gọi ngược lại hàm đó.
+ *
+ *   Vì vậy khi có tham số ?callback=tenHam, ta bọc kết quả trong
+ *   tenHam({...}); và trả về application/javascript. Không có tham số này
+ *   thì trả JSON thuần, giữ nguyên cách dùng bằng fetch hoặc Apps Script
+ *   client khác.
+ */
 function doGet(e) {
-  const action = String((e && e.parameter && e.parameter.action) || '').toLowerCase();
+  const prm = (e && e.parameter) || {};
+  const action = String(prm.action || '').toLowerCase();
+  const callback = String(prm.callback || '');
 
   // Kiểm tra sức khoẻ, dùng để xác nhận script còn chạy
   if (action === 'health') {
-    return traJson_({
+    return traKiemTra_(callback, {
       ok: true,
       message: 'KOKO CMS đang hoạt động.',
-      version: 'KOKO_CMS_V1',
+      version: 'KOKO_CMS_V2',
       soKhoaNoiDung: Object.keys(docNoiDung_()).length,
       soTaiLieu: docTaiLieu_().length,
-      adminSanSang: daCoMatKhauQuanTri_()
+      adminSanSang: daCoMatKhauQuanTri_(),
+      hoTroJsonp: true
     });
   }
 
   // Trả toàn bộ nội dung cho trang nạp khi mở
-  if (action === 'getdata' || action === 'no dung' || action === '') {
-    return traJson_({
-      ok: true,
-      content: docNoiDung_()
-    });
+  if (action === 'getdata' || action === '') {
+    return traKiemTra_(callback, { ok: true, content: docNoiDung_() });
   }
 
-  return traJson_({
+  // Ghi nội dung: trang admin gửi kèm payload trên URL
+  if (action === 'cmssave') {
+    if (!prm.payload) {
+      return traKiemTra_(callback, { ok: false, message: 'Thiếu dữ liệu (payload) cho cmsSave.' });
+    }
+    try {
+      return traKiemTra_(callback, luuNoiDung_(JSON.parse(prm.payload)));
+    } catch (err) {
+      return traKiemTra_(callback, loi_(err));
+    }
+  }
+
+  // Tải tệp lên: dữ liệu file quá lớn để đi trên URL, nên vẫn dùng POST
+  // và trả JSONP qua tham số callback.
+  if (action === 'uploadfont' || action === 'uploadimage' || action === 'deleteimage') {
+    if (!prm.payload) {
+      return traKiemTra_(callback, { ok: false, message: 'Thiếu dữ liệu (payload).' });
+    }
+    try {
+      const duLieu = JSON.parse(prm.payload);
+      if (action === 'uploadfont') return traKiemTra_(callback, taiPhongLen_(duLieu));
+      if (action === 'uploadimage') return traKiemTra_(callback, taiAnhLen_(duLieu));
+      return traKiemTra_(callback, xoaAnhDaTai_(duLieu));
+    } catch (err) {
+      return traKiemTra_(callback, loi_(err));
+    }
+  }
+
+  if (action === 'listimages') {
+    return traKiemTra_(callback, { ok: true, images: docAnhDaTai_() });
+  }
+
+  if (action === 'listfonts') {
+    return traKiemTra_(callback, { ok: true, fonts: docTaiLieu_().filter(function (x) { return x.loai === 'font'; }) });
+  }
+
+  return traKiemTra_(callback, {
     ok: true,
     message: 'KOKO CMS API',
-    actions: ['health', 'getData', 'cmsSave', 'uploadFont', 'uploadImage', 'listImages']
+    actions: ['health', 'getData', 'cmsSave', 'uploadFont', 'uploadImage', 'deleteImage', 'listImages', 'listFonts']
   });
 }
 
@@ -132,36 +181,46 @@ function doGet(e) {
  *  ENTRY POINT — DO POST
  * ========================================================================= */
 
+/**
+ * doPost — giữ nguyên cho trường hợp gọi bằng fetch hoặc Apps Script client.
+ *
+ * Trang admin trên linhtruong.vn gọi bằng JSONP qua doGet, vì fetch từ trang
+ * tĩnh sẽ bị chặn CORS. doPost vẫn giữ để dùng được từ công cụ kiểm thử
+ * hoặc khi gọi nội bộ.
+ *
+ * Nếu có tham số ?callback= trên URL, vẫn trả JSONP cho nhất quán.
+ */
 function doPost(e) {
   let payload = {};
+  const callback = String((e && e.parameter && e.parameter.callback) || '');
   try {
     payload = docDuLieuGuiLen_(e);
     const action = String(payload.action || '').toLowerCase();
 
     if (action === 'cmssave') {
-      return traJson_(luuNoiDung_(payload));
+      return traKiemTra_(callback, luuNoiDung_(payload));
     }
 
     if (action === 'uploadfont') {
-      return traJson_(taiPhongLen_(payload));
+      return traKiemTra_(callback, taiPhongLen_(payload));
     }
 
     if (action === 'uploadimage') {
-      return traJson_(taiAnhLen_(payload));
+      return traKiemTra_(callback, taiAnhLen_(payload));
     }
 
     if (action === 'listimages') {
-      return traJson_({ ok: true, images: docAnhDaTai_() });
+      return traKiemTra_(callback, { ok: true, images: docAnhDaTai_() });
     }
 
     if (action === 'deleteimage') {
-      return traJson_(xoaAnhDaTai_(payload));
+      return traKiemTra_(callback, xoaAnhDaTai_(payload));
     }
 
-    return traJson_({ ok: false, message: 'Hành động không hợp lệ: ' + action });
+    return traKiemTra_(callback, { ok: false, message: 'Hành động không hợp lệ: ' + action });
 
   } catch (err) {
-    return traJson_({ ok: false, message: err && err.message ? err.message : String(err) });
+    return traKiemTra_(callback, loi_(err));
   }
 }
 
@@ -608,6 +667,34 @@ function docDuLieuGuiLen_(e) {
   return {};
 }
 
+/**
+ * Trả kết quả theo đúng kiểu mà trang gọi đang cần.
+ *
+ *   có callback -> tra JSONP (application/javascript)
+ *                  vì trang tĩnh khác origin không đọc được fetch thường
+ *   không có    -> tra JSON thuần, cho fetch và client khác dùng
+ *
+ * Tên callback được kiểm tra bằng biểu thức chính quy: chỉ nhận chữ, số và
+ * dấu gạch dưới, bắt đầu bằng chữ hoặc gạch dưới. Nếu không kiểm tra, kẻ xấu
+ * có thể chèn mã tuỳ ý vào phản hồi.
+ */
+function traKiemTra_(callback, obj) {
+  if (callback && /^[A-Za-z_$][A-Za-z0-9_$.]{0,63}$/.test(callback)) {
+    return ContentService.createTextOutput(callback + '(' + JSON.stringify(obj) + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return traJson_(obj);
+}
+
+/** Gom lỗi thành đúng dạng JSON mà trang admin đọc. */
+function loi_(err) {
+  return {
+    ok: false,
+    message: err && err.message ? err.message : String(err)
+  };
+}
+
+/** Trả JSON thuần. Dùng khi trình duyệt gọi trực tiếp, không qua JSONP. */
 function traJson_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);

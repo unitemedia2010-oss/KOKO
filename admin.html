@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Quản trị nội dung — KOKO</title>
+<meta name="theme-color" content="#0a0c0e" />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="css/fonts.css" />
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+<!-- ==================================================================
+     MÀN ĐĂNG NHẬP
+     ================================================================== -->
+<div class="gate" id="gate">
+  <form class="gate-card" id="gateForm">
+    <div class="gate-mark">KOKO<span>.</span></div>
+    <h1>Quản trị nội dung</h1>
+    <p class="gate-sub">Nhập mật khẩu đã đặt trong Script Properties.</p>
+
+    <label class="gate-label" for="gatePass">Mật khẩu</label>
+    <div class="gate-row">
+      <input id="gatePass" type="password" autocomplete="current-password"
+             placeholder="••••••••••••" required />
+      <button class="btn primary" type="submit" id="gateBtn">Vào</button>
+    </div>
+
+    <p class="gate-msg" id="gateMsg" role="status"></p>
+
+    <details class="gate-help">
+      <summary>Quên mật khẩu?</summary>
+      <p>Trong Google Apps Script, mở <b>Project Settings → Script Properties</b>,
+         sửa <code>KOKO_ADMIN_PASSWORD</code>. Không cần deploy lại.</p>
+    </details>
+  </form>
+</div>
+
+<!-- ==================================================================
+     GIAO DIỆN CHÍNH
+     ================================================================== -->
+<div class="app" id="app" hidden>
+
+  <!-- Thanh trên -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="mark">KOKO<span>.</span></span>
+      <span class="topbar-sub">Quản trị</span>
+    </div>
+
+    <div class="topbar-right">
+      <span class="save-state" id="saveState"></span>
+      <a class="btn ghost sm" href="index.html" target="_blank" rel="noopener">Xem trang ↗</a>
+      <button class="btn ghost sm" id="logoutBtn" type="button">Thoát</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Thanh bên -->
+    <aside class="sidebar" id="sidebar">
+      <nav id="sideNav"></nav>
+
+      <div class="side-foot">
+        <button class="btn ghost sm full" id="exportBtn" type="button">Xuất toàn bộ (JSON)</button>
+      </div>
+    </aside>
+
+    <!-- Vùng chính -->
+    <main class="content" id="content">
+
+      <!-- ============ TAB: NỘI DUNG ============ -->
+      <div class="pane" id="paneNoiDung">
+        <div class="pane-head">
+          <div>
+            <h2 id="secTen"></h2>
+            <p class="pane-sub" id="secMoTa"></p>
+          </div>
+          <a class="btn ghost sm" id="xemSection" href="#hero" target="_blank" rel="noopener">Xem section ↗</a>
+        </div>
+
+        <div class="fields" id="fields"></div>
+
+        <div class="pane-actions">
+          <span class="dirty-note" id="dirtyNote"></span>
+          <button class="btn ghost" id="resetSection" type="button">Hoàn tác thay đổi</button>
+          <button class="btn primary" id="saveSection" type="button">Lưu section này</button>
+        </div>
+      </div>
+
+      <!-- ============ TAB: PHÔNG CHỮ ============ -->
+      <div class="pane" id="panePhong" hidden>
+        <div class="pane-head">
+          <div>
+            <h2>Phông chữ</h2>
+            <p class="pane-sub">Tải phông lên Drive, sau đó dán đoạn CSS vào
+              <code>css/fonts.css</code> và đổi biến font trong <code>css/style.css</code>.</p>
+          </div>
+        </div>
+
+        <div class="upload-box">
+          <label class="file-drop" id="fontDrop">
+            <input type="file" id="fontFile" accept=".woff2,.woff,.ttf,.otf" hidden />
+            <strong>Chọn tệp phông</strong>
+            <span>woff2, woff, ttf hoặc otf · tối đa 4 MB</span>
+          </label>
+          <button class="btn primary" id="uploadFontBtn" type="button" disabled>Tải lên</button>
+        </div>
+
+        <div class="result-box" id="fontResult" hidden>
+          <h3>Đoạn CSS cho phông này</h3>
+          <p class="result-note">Dán vào cuối file <code>css/fonts.css</code>, rồi đẩy lên GitHub.</p>
+          <pre id="fontCss" class="code"></pre>
+          <button class="btn ghost sm" id="copyFontCss" type="button">Sao chép CSS</button>
+        </div>
+
+        <h3 class="block-title">Phông đang dùng</h3>
+        <table class="table" id="fontTable">
+          <thead><tr><th>Tên</th><th>Định dạng</th><th>Ngày tải lên</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- ============ TAB: HÌNH ẢNH ============ -->
+      <div class="pane" id="paneAnh" hidden>
+        <div class="pane-head">
+          <div>
+            <h2>Hình ảnh</h2>
+            <p class="pane-sub">Tải ảnh lên Drive rồi dán URL vào thuộc tính <code>src</code>
+              của thẻ <code>&lt;img&gt;</code> trong <code>index.html</code>.</p>
+          </div>
+        </div>
+
+        <div class="upload-box">
+          <label class="file-drop" id="imgDrop">
+            <input type="file" id="imgFile" accept=".jpg,.jpeg,.png,.webp,.avif,.gif" hidden />
+            <strong>Chọn ảnh</strong>
+            <span>jpg, png, webp, avif hoặc gif · tối đa 6 MB · nên dùng webp</span>
+          </label>
+          <button class="btn primary" id="uploadImgBtn" type="button" disabled>Tải lên</button>
+        </div>
+
+        <div class="preview-box" id="imgPreview" hidden>
+          <img id="imgPreviewEl" alt="" />
+          <div>
+            <p class="result-note">URL công khai — dán vào thuộc tính src</p>
+            <code class="url-box" id="imgUrl"></code>
+            <button class="btn ghost sm" id="copyImgUrl" type="button">Sao chép URL</button>
+          </div>
+        </div>
+
+        <h3 class="block-title">Ảnh đã tải lên</h3>
+        <div class="gallery-admin" id="imgGrid"></div>
+        <p class="empty-note" id="imgEmpty">Chưa tải ảnh nào lên.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Thông báo -->
+  <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+</div>
+
+<script src="admin-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
