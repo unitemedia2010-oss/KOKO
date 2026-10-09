@@ -1,0 +1,26 @@
+{
+  "name": "koko",
+  "version": "1.0.0",
+  "description": "Static website ready for **GitHub Pages**. No build step is required.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unitemedia2010-oss/KOKO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unitemedia2010-oss/KOKO/issues"
+  },
+  "homepage": "https://github.com/unitemedia2010-oss/KOKO#readme",
+  "dependencies": {
+    "playwright": "^1.64.0"
+  }
+}

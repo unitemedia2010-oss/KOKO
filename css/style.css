@@ -1,0 +1,879 @@
+/* ==========================================================================
+   KOKO LINH — Executive Creative Portfolio
+   style.css
+
+   Màu chủ đạo: wine (đỏ burgundy) — dấu ấn riêng của KOKO
+   Màu phụ:     gold (ánh kim) — cho hiệu ứng, viền sáng, shader nền
+
+   Ghi chú về an toàn bố cục:
+   - Mọi tiêu đề lớn đều dùng cơ chế .fit-line (xem js/text-fit.js) để co
+     giãn theo bề rộng thật của chữ, thay vì chỉ dựa vào clamp().
+   - main dùng overflow-x: clip để chặn tràn ngang.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. BIẾN MÀU & FONT
+   ========================================================================== */
+:root {
+  /* nền & chữ */
+  --bg: #090909;
+  --bg-soft: #101010;
+  --card: #151515;
+  --text: #f2efe8;
+  --muted: #9b9791;          /* nâng từ #94918d để đạt tương phản AA */
+  --line: rgba(255,255,255,.12);
+  --line-strong: rgba(255,255,255,.24);
+
+  /* màu thương hiệu
+     --wine       : dùng làm NỀN (nút, gradient, thẻ màu). Giữ đậm để có sức nặng.
+     --wine-text  : dùng làm CHỮ. Trên nền tối phải sáng hơn --wine, nếu không
+                    chữ đỏ nhỏ (9-10px) sẽ không đạt chuẩn WCAG AA.
+     Tách hai biến này ra là để không phải hy sinh độ đậm của nút chỉ vì chữ. */
+  --wine: #ba1126;
+  --wine-2: #7c1724;
+  --wine-bright: #e3243e;
+  /* #d9455e vừa đủ 4.5:1 nhưng sát ngưỡng quá, sai số làm tròn của công cụ
+     kiểm tra có thể báo lỗi. #e0566d cho dư biên, nhìn vẫn đậm và sang trọng. */
+  --wine-text: #e0566d;
+
+  /* màu kim — dùng cho ánh sáng, không dùng cho chữ chữa trên nền tối */
+  --gold: #d4af6a;
+  --gold-soft: #e8cf9b;
+  --gold-deep: #a8853f;
+  --gold-glow: rgba(212,175,106,.28);
+
+  --paper: #e8e0d5;
+  --shadow: 0 30px 80px rgba(0,0,0,.35);
+
+  /* phông */
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --display: Montserrat, Inter, sans-serif;
+
+  /* nhịp chuyển động */
+  --ease-out: cubic-bezier(.2,.7,.2,1);
+  --ease-soft: cubic-bezier(.65,0,.35,1);
+}
+
+html[data-theme="light"] {
+  --bg: #f5f1eb;
+  --bg-soft: #fffdfa;
+  --card: #eee9e2;
+  --text: #151515;
+  --muted: #625e59;          /* nâng từ #6d6964 */
+  --line: rgba(0,0,0,.12);
+  --line-strong: rgba(0,0,0,.24);
+  --shadow: 0 30px 70px rgba(72,51,45,.13);
+
+  /* Trên nền sáng, đỏ gốc đã đủ tương phản nên không cần sáng thêm */
+  --wine-text: #9c0d1e;
+
+  /* trên nền sáng, gold phải đậm lại mới đủ tương phản */
+  --gold: #8a6a22;
+  --gold-soft: #a8853f;
+  --gold-deep: #6d5319;
+  --gold-glow: rgba(138,106,34,.18);
+}
+
+/* ==========================================================================
+   2. RESET & NỀN TẢNG
+   ========================================================================== */
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wine) transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  transition: background .45s ease, color .45s ease;
+}
+
+/* hạt nhiễu phủ lên toàn trang */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: .027;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.75'/%3E%3C/svg%3E");
+}
+
+::selection { background: var(--wine); color: #fff; }
+
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+section[id] { scroll-margin-top: 88px; }
+img { display: block; max-width: 100%; }
+main { overflow-x: clip; }          /* clip tốt hơn hidden: không tạo vùng cuộn ngang */
+button { font: inherit; }
+
+.shell { width: min(1280px, calc(100% - 48px)); margin: 0 auto; }
+.section { position: relative; padding: 140px 0; }
+.section-rule { border-top: 1px solid var(--line); }
+
+/* ==========================================================================
+   3. TIỆN ÍCH
+   ========================================================================== */
+.eyebrow {
+  display: flex; align-items: center; gap: 14px;
+  margin: 0 0 24px; font-size: 10px; letter-spacing: .34em;
+  text-transform: uppercase; color: var(--wine-text); font-weight: 600;
+}
+.eyebrow::before { content: ""; width: 52px; height: 1px; background: var(--wine-text); flex: none; }
+
+.serif { font-family: var(--serif); }
+.display { font-family: var(--display); }
+.muted { color: var(--muted); }
+/* Chữ đỏ luôn dùng biến --wine-text để đạt chuẩn tương phản AA */
+.wine { color: var(--wine-text); }
+
+/* Chữ chỉ có nét viền. Màu nét phải đủ tương phản với nền, nếu không chữ sẽ
+   gần như vô hình. --line-strong quá mờ nên dùng biến riêng. */
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(242,239,232,.62);
+}
+html[data-theme="light"] .outline-text { -webkit-text-stroke: 1px rgba(21,21,21,.5); }
+
+/* --- Hiệu thức xuất hiện khi cuộn ---
+   Mặc định HIỆN, và chỉ ẩn khi cờ reveal-armed được bật.
+
+   Điểm mấu chốt: cờ này KHÔNG được bật trong thẻ <head>. Nó chỉ được bật bởi
+   app.js, và chỉ sau khi app.js đã xác nhận mọi thứ cần thiết (GSAP hoặc
+   IntersectionObserver) đã sẵn sàng. Nhờ vậy:
+     - JS không tải được  -> nội dung hiện bình thường, không bị ẩn
+     - GSAP bị CDN chặn  -> IntersectionObserver lo, nội dung hiện bình thường
+     - JS lỗi giữa chừng -> nội dung vẫn hiện
+   Nhờ vậy trang KHÔNG BAO GIỜ trắng chữ. */
+.reveal, .reveal-left, .reveal-right {
+  opacity: 1;
+  transition: opacity .85s var(--ease-out), transform .85s var(--ease-out);
+}
+
+html.reveal-armed .reveal { opacity: 0; transform: translateY(28px); }
+html.reveal-armed .reveal-left { opacity: 0; transform: translateX(-28px); }
+html.reveal-armed .reveal-right { opacity: 0; transform: translateX(28px); }
+
+html.reveal-armed .reveal.is-in,
+html.reveal-armed .reveal-left.is-in,
+html.reveal-armed .reveal-right.is-in { opacity: 1; transform: none; }
+
+/* Con của nhóm có data-stagger: cùng trạng thái ẩn/hiện như trên */
+[data-stagger] > * {
+  opacity: 1;
+  transition: opacity .8s var(--ease-out), transform .8s var(--ease-out);
+}
+html.reveal-armed [data-stagger] > * { opacity: 0; transform: translateY(26px); }
+html.reveal-armed [data-stagger] > *.is-in { opacity: 1; transform: none; }
+
+/* Ảnh nền trong suốt: kích thước đặt theo CHIỀU CAO, chiều rộng suy ra từ
+   tỉ lệ gốc. Không đặt width/height cứng — làm vậy sẽ méo ảnh.
+   max-width:none là để không bị quy tắc img{max-width:100%} kéo méo theo. */
+.operator-person,
+.next-figure,
+.lifestyle-figure {
+  max-width: none;
+  object-fit: contain;
+}
+
+/* --- Tự co tiêu đề ---
+   width:100% + white-space:nowrap để js/text-fit.js đo được bề rộng chữ thật
+   rồi đặt font-size vừa khít. Không có JS vẫn hiện bình thường nhờ
+   .no-fit dưới đây.
+
+   font-size: inherit là điểm mấu chốt: nếu thiếu, thẻ <span> sẽ nhận cỡ
+   chữ 16px mặc định thay vì cỡ clamp() của tiêu đề cha, khiến text-fit co
+   nhầm và chữ bị thu nhỏ rất nhiều. */
+.fit-line {
+  display: block;
+  width: 100%;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+}
+html.no-fit .fit-line { white-space: normal; }
+
+/* ngăn một từ dài tràn ra ngoài khung */
+h1, h2, h3, p, blockquote { overflow-wrap: break-word; }
+
+/* ==========================================================================
+   4. THANH TIẾN TRÌNH
+   ========================================================================== */
+.progress {
+  position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+  z-index: 100; transform: scaleX(0); transform-origin: left;
+  background: linear-gradient(90deg, var(--wine), var(--gold-soft));
+}
+
+/* ==========================================================================
+   5. ĐIỀU HƯỚNG
+   ========================================================================== */
+.nav {
+  position: fixed; inset: 0 0 auto 0; z-index: 80;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 25px 34px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.brand, .nav-links, .theme-toggle, .menu-toggle { pointer-events: auto; }
+
+.brand {
+  display: inline-flex; align-items: center;
+  min-height: 24px; padding: 4px 0;
+  font: 800 18px/1 var(--display); letter-spacing: .26em; white-space: nowrap;
+}
+.brand i { color: var(--wine-bright); font-style: normal; }
+
+.nav-links { display: flex; gap: 28px; align-items: center; }
+
+/* Vùng bấm tối thiểu 24px theo khuyến nghị WCAG 2.2 (target size).
+   padding + negative margin giữ khoảng cách thị giác như cũ mà không
+   làm các mục dính sát nhau. */
+.nav-links a {
+  display: inline-flex; align-items: center;
+  min-height: 24px;
+  padding: 6px 0;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .16em;
+  opacity: .8; transition: opacity .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.nav-links a:hover, .nav-links a.is-active { opacity: 1; color: var(--gold); }
+
+.theme-toggle {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--line-strong); background: transparent;
+  color: var(--text); display: grid; place-items: center;
+  cursor: pointer; flex: none;
+  transition: border-color .25s ease, background .25s ease, transform .25s ease;
+}
+.theme-toggle:hover { border-color: var(--gold); background: var(--gold-glow); transform: rotate(18deg); }
+.theme-toggle svg { width: 16px; height: 16px; }
+
+/* Nút mở menu — chỉ hiện trên màn hình hẹp */
+.menu-toggle {
+  display: none; width: 38px; height: 38px; flex: none;
+  border-radius: 50%; border: 1px solid var(--line-strong);
+  background: transparent; color: var(--text);
+  cursor: pointer; padding: 0;
+  place-items: center;
+}
+.menu-toggle span {
+  display: block; width: 15px; height: 1px;
+  background: currentColor; position: relative;
+  transition: transform .3s var(--ease-out), background .2s ease;
+}
+.menu-toggle span::before, .menu-toggle span::after {
+  content: ""; position: absolute; left: 0; width: 15px; height: 1px;
+  background: currentColor; transition: transform .3s var(--ease-out);
+}
+.menu-toggle span::before { top: -5px; }
+.menu-toggle span::after { top: 5px; }
+
+.menu-toggle[aria-expanded="true"] span { background: transparent; }
+.menu-toggle[aria-expanded="true"] span::before { transform: translateY(5px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] span::after { transform: translateY(-5px) rotate(-45deg); }
+
+/* --- Menu trượt trên mobile ---
+   z-index 79: nằm dưới .nav (80) để nút đóng X vẫn bấm được,
+   nhưng trên main/footer (1) để che nội dung trang. */
+.mobile-menu {
+  position: fixed; inset: 0; z-index: 79;
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  backdrop-filter: blur(18px);
+  opacity: 0; visibility: hidden;
+  transition: opacity .35s ease, visibility .35s;
+}
+.mobile-menu.is-open { opacity: 1; visibility: visible; }
+
+.mobile-menu ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 8px; text-align: center;
+}
+.mobile-menu a {
+  display: block; font: 800 clamp(30px, 9vw, 52px)/1.25 var(--display);
+  letter-spacing: -.03em; text-transform: uppercase;
+  opacity: 0; transform: translateY(18px);
+  transition: opacity .45s ease, transform .45s var(--ease-out), color .2s ease;
+}
+.mobile-menu.is-open a { opacity: 1; transform: none; }
+.mobile-menu a:hover { color: var(--gold); }
+.mobile-menu .mm-foot {
+  margin-top: 34px; font-size: 9px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--muted);
+  opacity: 0; transition: opacity .45s ease .3s;
+}
+.mobile-menu.is-open .mm-foot { opacity: 1; }
+
+/* khi mở menu, khoá cuộn trang nền */
+html.menu-open, html.menu-open body { overflow: hidden; }
+
+/* ==========================================================================
+   6. NỀN SHADER KIM
+   ========================================================================== */
+.shader-layer {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  opacity: .5;
+  transition: opacity .6s ease;
+}
+html[data-theme="light"] .shader-layer { opacity: .3; }
+.shader-layer canvas { display: block; width: 100%; height: 100%; }
+
+/* main và footer phải nằm trên shader.
+   KHÔNG gộp .nav/.progress vào đây: chúng đã có position:fixed và z-index riêng,
+   thêm vào sẽ ghi đè khiến nav rơi xuống dưới main. */
+main, footer { position: relative; z-index: 1; }
+
+/* ==========================================================================
+   7. HERO
+   ========================================================================== */
+.hero {
+  min-height: 100svh; padding: 132px 0 28px;
+  display: flex; flex-direction: column; justify-content: center; gap: 44px;
+}
+.hero-layout {
+  width: min(1160px, calc(100% - 96px)); margin: auto;
+  display: grid; grid-template-columns: 1.12fr 1fr;
+  gap: clamp(40px, 6vw, 90px); align-items: center;
+}
+.hero-copy { min-width: 0; }
+.hero-kicker {
+  margin: 0 0 30px; color: var(--muted);
+  font-size: 11px; line-height: 1.7; letter-spacing: .2em; text-transform: uppercase;
+}
+.hero-kicker::before {
+  content: ""; display: inline-block; width: 26px; height: 2px;
+  margin: 0 12px 3px 0; background: var(--wine);
+}
+/* font-size tách riêng khỏi font shorthand để .fit-line (bên trong) kế thừa
+   đúng cỡ này qua font-size: inherit */
+.hero-copy h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(76px, 8.5vw, 126px);
+  line-height: .92;
+  letter-spacing: -.065em;
+}
+.hero-copy h1 span { color: var(--wine-bright); }
+.hero-message { margin: 32px 0 0; font-family: var(--serif); font-weight: 500; letter-spacing: -.015em; }
+.hero-message span { display: block; }
+.hero-message span:last-child { color: var(--muted); }
+
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 24px; margin-top: 32px; }
+
+/* Nút dạng kính lỏng — lấy cảm hứng từ nút liquid của JD, viết bằng CSS thuần */
+.liquid {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+  min-height: 48px; padding: 15px 24px;
+  font-size: 12px; font-weight: 500;
+  cursor: pointer;
+  transition: background .25s ease, color .25s ease, border-color .25s ease, transform .25s var(--ease-out);
+}
+/* lớp ánh sáng bám theo con trỏ chuột (biến --mx/--my do JS cập nhật) */
+.liquid::before {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(
+    140px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,.34), transparent 62%
+  );
+  opacity: 0; transition: opacity .3s ease;
+}
+.liquid:hover::before { opacity: 1; }
+/* viền kim mảnh chạy dọc theo mép trên */
+.liquid::after {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--gold-soft), transparent 42%, transparent 58%, var(--gold));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .3s ease;
+}
+.liquid:hover::after { opacity: .85; }
+.liquid > * { position: relative; z-index: 1; }
+
+.liquid.primary {
+  background: linear-gradient(135deg, var(--wine), var(--wine-2));
+  color: #fff; border: 1px solid transparent;
+  box-shadow: 0 12px 34px rgba(186,17,38,.3);
+}
+.liquid.primary:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(186,17,38,.42); }
+
+.liquid.ghost { border-bottom: 1px solid var(--line-strong); color: var(--text); padding-inline: 4px; }
+.liquid.ghost:hover { color: var(--gold); }
+
+.hero-portrait { margin: 0; min-width: 0; }
+.hero-frame {
+  aspect-ratio: 4 / 5; max-height: 580px; overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  transition: border-color .5s ease;
+}
+.hero-frame:hover { border-color: var(--gold-deep); }
+.hero-frame img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 46%; }
+
+.hero-portrait figcaption {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding-top: 16px; font-size: 9px; line-height: 1.6;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+}
+.hero-footer {
+  width: min(1160px, calc(100% - 96px)); margin: 0 auto;
+  padding-top: 20px; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; gap: 20px;
+  color: var(--muted); font-size: 9px; line-height: 1.6;
+  letter-spacing: .18em; text-transform: uppercase;
+}
+.hero-scroll { display: inline-flex; align-items: center; gap: 16px; min-height: 24px; padding: 5px 0; }
+
+/* ==========================================================================
+   8. MANIFESTO
+   ========================================================================== */
+.manifesto .quote {
+  margin: 0; font-family: var(--serif); font-weight: 500;
+  font-size: clamp(38px, 5.5vw, 74px); line-height: 1.12;
+  max-width: 1120px; letter-spacing: -.02em; text-wrap: pretty;
+}
+.stats {
+  margin-top: 88px; padding-top: 38px; border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 24px;
+}
+.stat strong { display: block; font: 800 clamp(42px, 5vw, 70px)/1 var(--display); letter-spacing: -.05em; }
+.stat span { display: block; margin-top: 12px; color: var(--muted); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
+
+/* ==========================================================================
+   9. PROFILE
+   ========================================================================== */
+.about-grid { display: grid; grid-template-columns: 1.02fr .98fr; gap: 84px; align-items: center; }
+.about-collage { position: relative; min-height: 720px; }
+.about-photo-a { position: absolute; left: 0; top: 0; width: 68%; height: 78%; overflow: hidden; box-shadow: var(--shadow); }
+.about-photo-a img, .about-photo-b img { width: 100%; height: 100%; object-fit: cover; }
+.about-photo-b {
+  position: absolute; right: 0; bottom: 0; width: 52%; height: 47%;
+  border: 7px solid var(--bg); overflow: hidden; box-shadow: var(--shadow);
+  transition: border-color .45s ease;
+}
+.about-photo-b:hover { border-color: var(--gold-deep); }
+.about-index {
+  position: absolute; right: 3%; top: 4%;
+  font: 900 120px/1 var(--display); color: transparent;
+  -webkit-text-stroke: 1px var(--line-strong);
+}
+.about-copy h2 { margin: 0 0 32px; font-family: var(--serif); font-weight: 500; font-size: clamp(40px, 4.5vw, 64px); line-height: 1.05; text-wrap: balance; }
+.about-copy p { color: var(--muted); font-size: 15px; line-height: 1.85; margin: 0 0 20px; text-wrap: pretty; }
+.signature { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--line); }
+.signature strong { display: block; font: italic 500 30px/1 var(--serif); }
+.signature span { display: block; margin-top: 10px; color: var(--muted); font-size: 9px; letter-spacing: .25em; text-transform: uppercase; }
+
+/* ==========================================================================
+   10. OPERATOR
+   ========================================================================== */
+.operator {
+  min-height: 870px; overflow: hidden;
+  background: linear-gradient(145deg, #170509 0%, #2a060c 48%, #0b0b0b 100%);
+  color: #f5eee9;
+  display: flex; align-items: center;
+}
+html[data-theme="light"] .operator {
+  background: linear-gradient(145deg, #f8e7e9 0%, #ead4d7 50%, #f7f2ec 100%);
+  color: #171717;
+}
+.operator-bg {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font: 900 clamp(130px, 19vw, 300px)/.8 var(--display);
+  letter-spacing: -.08em; color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,.15);
+  white-space: nowrap;
+}
+html[data-theme="light"] .operator-bg { -webkit-text-stroke: 1px rgba(0,0,0,.12); }
+
+.operator-copy { position: relative; z-index: 3; width: 48%; padding-left: 4vw; min-width: 0; }
+.operator-copy h2 {
+  font: 800 clamp(50px, 7vw, 104px)/.9 var(--display);
+  letter-spacing: -.06em; margin: 0 0 28px; text-transform: uppercase;
+}
+.operator-copy p { font-size: 15px; line-height: 1.8; max-width: 560px; color: rgba(245,238,233,.7); text-wrap: pretty; }
+html[data-theme="light"] .operator-copy p { color: #5e5556; }
+
+.operator-person {
+  position: absolute; right: 2%; bottom: -1%; height: 96%; width: auto;
+  z-index: 2; filter: drop-shadow(0 30px 45px rgba(0,0,0,.45));
+}
+.operator-note { display: flex; gap: 38px; margin-top: 38px; }
+.operator-note div { max-width: 170px; }
+.operator-note b { font: 700 11px/1 var(--display); letter-spacing: .18em; text-transform: uppercase; }
+.operator-note span { display: block; margin-top: 9px; font-size: 12px; line-height: 1.6; opacity: .64; }
+
+/* ==========================================================================
+   11. HOW SHE BUILDS
+   ========================================================================== */
+.how-head { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end; margin-bottom: 64px; }
+.how-head h2 { margin: 0; font: 800 clamp(54px, 7vw, 100px)/.88 var(--display); letter-spacing: -.06em; text-transform: uppercase; }
+.how-head p { margin: 0 0 8px; font: italic 500 30px/1.25 var(--serif); color: var(--muted); max-width: 520px; text-wrap: pretty; }
+
+.build-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.build-card {
+  min-height: 410px; padding: 32px;
+  border: 1px solid var(--line); background: var(--bg-soft);
+  position: relative; overflow: hidden; transition: .35s ease;
+}
+.build-card:hover { transform: translateY(-7px); border-color: var(--gold-deep); background: var(--card); }
+.build-card .num { font: 800 72px/1 var(--display); color: transparent; -webkit-text-stroke: 1px var(--line-strong); }
+.build-card h3 { margin: 90px 0 16px; font: 800 28px/1 var(--display); text-transform: uppercase; letter-spacing: -.04em; }
+.build-card p { color: var(--muted); line-height: 1.75; font-size: 14px; text-wrap: pretty; }
+.build-card::after {
+  content: ""; position: absolute; left: 32px; right: 32px; bottom: 0; height: 2px;
+  background: linear-gradient(90deg, var(--wine), var(--gold));
+  transform: scaleX(0); transform-origin: left; transition: transform .4s ease;
+}
+.build-card:hover::after { transform: scaleX(1); }
+
+/* ==========================================================================
+   12. JOURNEY (cuộn ngang trên desktop)
+   ========================================================================== */
+.journey-wrap { position: relative; height: 100vh; overflow: hidden; background: var(--bg-soft); }
+.journey-track { display: flex; height: 100%; width: max-content; }
+.journey-panel {
+  width: 100vw; height: 100vh; flex: none;
+  padding: 70px max(24px, 6vw);
+  display: flex; align-items: center; position: relative;
+}
+.journey-title { width: 100vw; }
+.journey-title h2 { margin: 0; font: 900 clamp(78px, 12vw, 190px)/.78 var(--display); letter-spacing: -.08em; text-transform: uppercase; }
+.journey-title .serif-line { margin-left: 6vw; font: italic 500 clamp(60px, 10vw, 160px)/.8 var(--serif); color: var(--muted); }
+.journey-media {
+  width: min(72vw, 1080px); height: min(70vh, 720px);
+  overflow: hidden; position: relative; box-shadow: var(--shadow);
+}
+.journey-media img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.72) contrast(1.04); }
+.journey-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.45), transparent 60%); }
+.journey-card {
+  position: absolute; left: 52%; bottom: 10%;
+  width: min(490px, 42vw); padding: 28px;
+  background: color-mix(in srgb, var(--bg) 87%, transparent);
+  backdrop-filter: blur(18px);
+  border-left: 2px solid var(--wine); box-shadow: var(--shadow);
+  transition: border-color .35s ease;
+}
+.journey-card:hover { border-color: var(--gold); }
+.journey-card .year { font: 800 42px/1 var(--display); color: var(--gold); letter-spacing: -.05em; }
+.journey-card h3 { margin: 10px 0; font: 500 28px/1 var(--serif); }
+.journey-card p { margin: 0; color: var(--muted); line-height: 1.7; font-size: 13px; text-wrap: pretty; }
+
+/* ==========================================================================
+   13. CASE STUDY
+   ========================================================================== */
+.case-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 56px; }
+.case-head h2 { margin: 0; font: 900 clamp(64px, 9vw, 142px)/.78 var(--display); letter-spacing: -.075em; text-transform: uppercase; }
+.case-head p { max-width: 420px; margin: 0 0 7px; color: var(--muted); line-height: 1.7; text-wrap: pretty; }
+
+.case-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+.case-card {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--line); background: var(--bg-soft);
+  min-height: 260px; padding: 28px;
+  transition: border-color .35s ease, transform .35s var(--ease-out);
+}
+.case-card:hover { border-color: var(--gold-deep); transform: translateY(-5px); }
+.case-card h3 { margin: 0; font: 700 24px/1.1 var(--display); letter-spacing: -.04em; }
+.case-card p { color: var(--muted); line-height: 1.7; font-size: 13px; max-width: 520px; text-wrap: pretty; }
+.case-card .tag {
+  display: block; margin-bottom: 12px; color: var(--wine-text);
+  font-size: 9px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700;
+}
+
+.case-service { grid-column: span 7; min-height: 420px; display: flex; flex-direction: column; justify-content: end; color: #fff; }
+.case-service img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-out); }
+.case-service:hover img { transform: scale(1.05); }
+.case-service::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.9), rgba(0,0,0,.1)); }
+
+.case-kpi {
+  grid-column: span 5; color: #fff;
+  background: linear-gradient(150deg, var(--wine), var(--wine-2));
+  display: flex; flex-direction: column; justify-content: space-between;
+  min-height: 420px; border-color: transparent;
+}
+.case-kpi:hover { border-color: var(--gold); transform: none; }
+.case-kpi strong { font: 900 clamp(78px, 9vw, 132px)/.8 var(--display); letter-spacing: -.08em; }
+.case-kpi p { color: rgba(255,255,255,.82); }
+
+.case-small { grid-column: span 4; }
+.case-wide { grid-column: span 8; min-height: 340px; color: #fff; display: flex; align-items: end; }
+.case-wide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--ease-out); }
+.case-wide:hover img { transform: scale(1.05); }
+.case-wide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.85), rgba(0,0,0,.1)); }
+
+.case-service > *:not(img), .case-wide > *:not(img) { position: relative; z-index: 2; }
+
+/* ==========================================================================
+   14. PEOPLE
+   ========================================================================== */
+.people { overflow: hidden; }
+.people-grid { display: grid; grid-template-columns: .92fr 1.08fr; gap: 70px; align-items: center; }
+.people-copy h2 { margin: 0; font: 900 clamp(58px, 8vw, 120px)/.82 var(--display); letter-spacing: -.07em; text-transform: uppercase; }
+.people-copy .lead { margin: 32px 0; font: italic 500 32px/1.2 var(--serif); text-wrap: pretty; }
+.people-copy p { color: var(--muted); line-height: 1.8; font-size: 14px; text-wrap: pretty; }
+.people-photo { position: relative; min-height: 650px; }
+.people-photo .main { position: absolute; inset: 0 9% 10% 0; overflow: hidden; }
+.people-photo .main img { width: 100%; height: 100%; object-fit: cover; }
+.people-photo .float {
+  position: absolute; width: 47%; right: 0; bottom: 0;
+  border: 6px solid var(--bg); box-shadow: var(--shadow);
+  transition: border-color .45s ease;
+}
+.people-photo .float:hover { border-color: var(--gold-deep); }
+
+/* ==========================================================================
+   15. POINT OF VIEW
+   ========================================================================== */
+.pov { background: var(--paper); color: #121212; }
+/* Section này nền sáng, nên dùng đỏ đậm --wine gốc thay vì --wine-text */
+.pov .eyebrow { color: var(--wine); }
+.pov .eyebrow::before { background: var(--wine); }
+.pov-head { display: flex; justify-content: space-between; gap: 40px; align-items: end; }
+.pov-head h2 { margin: 0; font: 900 clamp(72px, 11vw, 170px)/.8 var(--display); letter-spacing: -.08em; text-transform: uppercase; }
+.pov-head p { max-width: 380px; color: #5f5952; line-height: 1.7; text-wrap: pretty; }
+
+.pov-list { margin-top: 60px; border-top: 1px solid rgba(0,0,0,.18); }
+.pov-item {
+  display: grid; grid-template-columns: 90px 1fr auto; gap: 30px;
+  align-items: center; padding: 34px 0;
+  border-bottom: 1px solid rgba(0,0,0,.18);
+  transition: background .3s ease;
+}
+.pov-item:hover { background: rgba(255,255,255,.45); }
+.pov-item .idx { font: 700 12px/1 var(--display); color: var(--wine); }
+.pov-item h3 { margin: 0; font: 500 clamp(31px, 4vw, 55px)/1.05 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
+.pov-item span:last-child { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #6b625a; white-space: nowrap; }
+
+/* ==========================================================================
+   16. LIFESTYLE
+   ========================================================================== */
+.lifestyle { min-height: 900px; display: flex; align-items: center; overflow: hidden; background: var(--bg-soft); }
+.lifestyle-photo { position: absolute; inset: 0 0 0 48%; overflow: hidden; }
+.lifestyle-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.lifestyle-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-soft), transparent 35%); }
+.lifestyle-copy { position: relative; z-index: 2; max-width: 610px; }
+.lifestyle-copy h2 { margin: 0; font: 900 clamp(58px, 8vw, 112px)/.82 var(--display); letter-spacing: -.07em; text-transform: uppercase; }
+.lifestyle-copy p { color: var(--muted); line-height: 1.85; font-size: 15px; max-width: 520px; text-wrap: pretty; }
+.lifestyle-figure {
+  position: absolute; height: 87%; right: 4%; bottom: 0; z-index: 3;
+  filter: drop-shadow(0 25px 35px rgba(0,0,0,.32));
+}
+
+/* ==========================================================================
+   17. GALLERY
+   ========================================================================== */
+.gallery-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 48px; }
+.gallery-head h2 { margin: 0; font: 800 clamp(48px, 6vw, 88px)/.9 var(--display); letter-spacing: -.06em; text-transform: uppercase; }
+.gallery-head p { color: var(--muted); max-width: 420px; line-height: 1.7; text-wrap: pretty; }
+
+.gallery-grid { display: grid; grid-template-columns: 1.15fr .85fr .85fr; grid-template-rows: 330px 330px; gap: 16px; }
+.gallery-item { overflow: hidden; position: relative; background: var(--card); }
+.gallery-item:first-child { grid-row: span 2; }
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .8s var(--ease-out), filter .5s ease;
+  filter: saturate(.78);
+}
+.gallery-item:hover img { transform: scale(1.045); filter: saturate(1); }
+
+/* ==========================================================================
+   18. NEXT CHAPTER
+   ========================================================================== */
+.next { min-height: 900px; overflow: hidden; background: #0b0b0b; color: #f4eee8; display: flex; align-items: center; }
+html[data-theme="light"] .next { background: #151515; }
+.next-word {
+  position: absolute; left: -3%; top: 7%;
+  font: 900 clamp(120px, 20vw, 320px)/.8 var(--display);
+  letter-spacing: -.09em; color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,.12);
+  white-space: nowrap;
+}
+.next-copy { position: relative; z-index: 3; width: 55%; min-width: 0; }
+.next-copy h2 { margin: 0; font: 900 clamp(56px, 8vw, 120px)/.82 var(--display); letter-spacing: -.07em; text-transform: uppercase; }
+.next-copy blockquote { margin: 34px 0 0; font: italic 500 clamp(27px, 3vw, 42px)/1.2 var(--serif); color: #ddd5cf; max-width: 640px; text-wrap: pretty; }
+.next-copy p { color: #9a938d; line-height: 1.8; max-width: 530px; text-wrap: pretty; }
+.next-figure {
+  position: absolute; right: 3%; bottom: 0; height: 91%; z-index: 2;
+  filter: drop-shadow(0 30px 50px rgba(0,0,0,.42));
+}
+
+/* ==========================================================================
+   19. CONTACT
+   ========================================================================== */
+.contact {
+  min-height: 78vh;
+  background: linear-gradient(145deg, #2c060d, #130306);
+  color: #fff; display: grid; place-items: center;
+  text-align: center; overflow: hidden;
+}
+.contact::before {
+  content: ""; position: absolute; width: 46vw; height: 46vw; border-radius: 50%;
+  background: rgba(212,175,106,.2); filter: blur(110px);
+}
+.contact-inner { position: relative; z-index: 2; }
+.contact h2 { margin: 0; font: italic 500 clamp(68px, 10vw, 154px)/.8 var(--serif); }
+.contact p { color: rgba(255,255,255,.72); max-width: 520px; line-height: 1.75; margin: 28px auto 36px; text-wrap: pretty; }
+
+.contact-btn {
+  width: 150px; height: 150px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.38);
+  display: grid; place-items: center; margin: 0 auto;
+  font: 700 10px/1 var(--display); letter-spacing: .18em; text-transform: uppercase;
+  transition: background .35s ease, color .35s ease, transform .35s var(--ease-out), border-color .35s ease;
+}
+.contact-btn:hover { background: var(--gold); color: #111; transform: scale(1.06); border-color: var(--gold); }
+
+/* ==========================================================================
+   20. FOOTER
+   ========================================================================== */
+footer { border-top: 1px solid rgba(255,255,255,.11); background: #090909; color: #f2efe8; padding: 56px 0; }
+.footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 50px; }
+footer .logo { font: 800 32px/1 var(--display); letter-spacing: .18em; }
+footer p, footer a { color: #a49e98; font-size: 12px; line-height: 1.7; }   /* nâng từ #777 */
+footer a { display: inline-block; min-height: 24px; padding: 3px 0; transition: color .2s ease; }
+footer a:hover { color: var(--gold); }
+footer .label { display: block; color: #ccc6c0; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 14px; }
+.copyright {
+  margin-top: 45px; padding-top: 26px; border-top: 1px solid rgba(255,255,255,.1);
+  color: #8d8781; font-size: 10px; display: flex; justify-content: space-between; gap: 20px;
+}
+
+/* ==========================================================================
+   21. MÀN HÌNH HẸP
+   ========================================================================== */
+@media (max-width: 980px) {
+  .shell { width: min(calc(100% - 32px), 760px); }
+  .section { padding: 100px 0; }
+
+  .nav { padding: 20px 18px; }
+  .nav-links { display: none; }
+  .menu-toggle { display: grid; }
+
+  .hero { padding-top: 116px; gap: 36px; }
+  .hero-layout { width: calc(100% - 48px); gap: 32px; }
+  .hero-kicker { font-size: 9px; letter-spacing: .12em; margin-bottom: 24px; }
+  .hero-message { margin-top: 24px; }
+  .hero-actions { gap: 8px 20px; margin-top: 24px; }
+  .hero-footer { width: calc(100% - 48px); }
+
+  .stats { grid-template-columns: repeat(2, 1fr); }
+
+  .about-grid, .people-grid { grid-template-columns: 1fr; gap: 54px; }
+  .about-collage { min-height: 640px; }
+
+  .operator { min-height: 880px; align-items: flex-start; padding-top: 100px; }
+  .operator-copy { width: 78%; padding-left: 24px; }
+  .operator-person { height: 68%; right: -10%; }
+
+  .how-head { grid-template-columns: 1fr; gap: 28px; }
+  .build-grid { grid-template-columns: 1fr; }
+  .build-card { min-height: 290px; }
+  .build-card h3 { margin-top: 55px; }
+
+  /* journey chuyển từ cuộn ngang sang dọc */
+  .journey-wrap { height: auto; overflow: visible; }
+  .journey-track { display: block; width: auto; }
+  .journey-panel { width: auto; height: auto; min-height: 80vh; padding: 80px 16px; display: block; }
+  .journey-title { width: auto; min-height: 72vh; display: flex; flex-direction: column; justify-content: center; }
+  .journey-media { width: 100%; height: 58vh; }
+  .journey-card { position: relative; left: auto; bottom: auto; width: calc(100% - 28px); margin: -100px 14px 0; z-index: 3; }
+
+  .case-head { display: block; }
+  .case-head p { margin-top: 28px; }
+  .case-service, .case-kpi, .case-small, .case-wide { grid-column: span 12; }
+
+  .people-photo { min-height: 560px; }
+
+  .pov-head { display: block; }
+  .pov-head p { margin-top: 28px; }
+  .pov-item { grid-template-columns: 45px 1fr; }
+  .pov-item span:last-child { display: none; }
+
+  .lifestyle { min-height: 900px; align-items: flex-start; padding-top: 100px; }
+  .lifestyle-photo { inset: 42% 0 0 0; }
+  .lifestyle-photo::after { background: linear-gradient(180deg, var(--bg-soft), transparent 35%); }
+  .lifestyle-figure { height: 52%; right: -17%; }
+  .lifestyle-copy { width: 78%; }
+
+  .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 420px 260px 260px; }
+  .gallery-item:first-child { grid-column: span 2; grid-row: auto; }
+
+  .next { min-height: 900px; align-items: flex-start; padding-top: 110px; }
+  .next-copy { width: 78%; }
+  .next-figure { height: 59%; right: -13%; }
+
+  .footer-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .hero { padding-top: 112px; gap: 28px; }
+  .hero-layout { grid-template-columns: 1fr; gap: 36px; width: calc(100% - 40px); }
+  .hero-kicker { margin-bottom: 22px; font-size: 10px; letter-spacing: .1em; }
+  .hero-actions { gap: 12px 20px; }
+  .liquid { font-size: 11px; }
+  .liquid.primary { padding: 14px 18px; }
+  .hero-frame { aspect-ratio: 4 / 4.5; max-height: none; }
+  .hero-footer { width: calc(100% - 40px); font-size: 8px; letter-spacing: .1em; }
+
+  .stats { gap: 36px 16px; }
+  .about-collage { min-height: 520px; }
+  .about-photo-a { width: 76%; height: 75%; }
+  .about-photo-b { width: 58%; height: 43%; }
+
+  .operator { min-height: 820px; }
+  .operator-copy { width: 92%; }
+  .operator-person { height: 54%; right: -29%; opacity: .88; }
+  .operator-note { gap: 18px; }
+
+  .case-service, .case-kpi { min-height: 350px; }
+  .people-photo { min-height: 480px; }
+  .pov-item { padding: 28px 0; gap: 12px; }
+  .lifestyle-copy { width: 93%; }
+  .lifestyle-figure { right: -36%; height: 43%; }
+  .gallery-grid { display: block; }
+  .gallery-item { height: 420px; margin-bottom: 12px; }
+  .next-copy { width: 94%; }
+  .next-figure { height: 47%; right: -35%; opacity: .82; }
+  .contact-btn { width: 125px; height: 125px; }
+  .copyright { flex-direction: column; }
+}
+
+/* ==========================================================================
+   22. TẬN DỤNG GIẢM CHUYỂN ĐỘNG
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  /* ép mọi nội dung hiện ra, kể cả khi JS đã bật cờ reveal-armed */
+  html.reveal-armed .reveal,
+  html.reveal-armed .reveal-left,
+  html.reveal-armed .reveal-right,
+  html.reveal-armed [data-stagger] > * { opacity: 1 !important; transform: none !important; }
+
+  /* tắt hẳn shader vì nó là hiệu ứng liên tục */
+  .shader-layer { display: none; }
+}

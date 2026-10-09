@@ -1,0 +1,33 @@
+/* ==========================================================================
+   fonts.css — KOKO LINH portfolio
+   --------------------------------------------------------------------------
+   File này là "kho phông" của website. CMS sẽ GHI ĐÈ file này khi bạn tải
+   phông mới lên, nên toàn bộ khai báo @font-face nên nằm ở đây.
+
+   Ba biến font quan trọng (khai báo trong style.css):
+     --serif   : phông chữ có chân, dùng cho câu văn và pull-quote
+     --sans    : phông chữ không chân, dùng cho nội dung chữa
+     --display : phông chữ tiêu đề lớn, dạng sans-serif đậm
+
+   Đổi phông = đổi giá trị 3 biến trên. Không cần sửa file HTML.
+   ========================================================================== */
+
+/* ---- Phông nền, tải từ Google Fonts ---- */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap");
+
+/* ==========================================================================
+   KHU VỰC DÀNH CHO PHÔNG TẢI LÊN (CMS sẽ chèn tự động vào đây)
+   --------------------------------------------------------------------------
+   Ví dụ sau khi CMS tải lên một file .woff2 tên "Be Vietnam Pro":
+
+   @font-face {
+     font-family: "Be Vietnam Pro";
+     src: url("https://drive.google.com/uc?id=FILE_ID") format("woff2");
+     font-weight: 100 900;
+     font-display: swap;
+   }
+
+   Sau đó trong CMS chọn phông này cho ô "Display" là xong.
+   Lưu ý: nên dùng .woff2 vì nhẹ nhất. Nếu tải .ttf, trình duyệt vẫn dùng
+   được nhưng sẽ chậm hơn vài trăm mili giây.
+   ========================================================================== */
