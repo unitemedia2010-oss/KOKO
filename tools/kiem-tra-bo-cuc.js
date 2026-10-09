@@ -75,6 +75,9 @@ const PROBE = () => {
   document.querySelectorAll('h1, h2, h3, h4, p, li, span, a, button, blockquote').forEach((el) => {
     if (!el.textContent.trim()) return;
     if (el.children.length) return;
+    /* .sr-only la dau chu chi doc man hinh, co chu dung 1px la chay.
+       Do phai no "bi cat" la dung, khong phai loi bo cuc. */
+    if (el.classList.contains('sr-only')) return;
     const cs = getComputedStyle(el);
     if (cs.display === 'inline') return;
     if (cs.whiteSpace === 'nowrap' && el.classList.contains('fit-line')) return; /* text-fit lo phan nay */

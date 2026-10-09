@@ -32,7 +32,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
   <link rel="stylesheet" href="css/fonts.css" />
-  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link rel="stylesheet" href="css/style.css?v=3" />
+  <link rel="stylesheet" href="css/hero.css?v=1" />
 
   <!-- KHÔNG bật cờ ẩn-nội-dung ở đây.
        Cờ đó do app.js bật, và chỉ sau khi app.js đã xác nhận mọi thứ cần thiết
@@ -94,44 +95,44 @@
 
   <main id="top">
 
-    <!-- ===================================================== 01 · HERO -->
-    <section class="hero" id="hero">
-      <div class="hero-layout">
-        <div class="hero-copy">
-          <p class="hero-kicker" data-cms="hero_kicker">Tổng Giám Đốc · Unite Group</p>
+    <!-- ===================================================== 01 · HERO
+         Hieu ung "cong mo": hai tam nien mo ra khi cuon, de lo anh o giua.
+         Anh dung LOCAL (khong phu thuoc Unsplash) va van co data-cms de
+         CMS sua duoc. -->
+    <section class="portal" id="hero">
+      <div class="portal-stage">
 
-          <h1>
-            <span class="fit-line" data-cms="hero_title_1">KOKO</span>
-            <span class="fit-line" data-cms="hero_title_2">LINH<i>.</i></span>
-          </h1>
+        <div class="portal-image" role="img"
+             aria-label="Koko Linh tại văn phòng Unite Group"></div>
+        <div class="portal-duotone" aria-hidden="true"></div>
+        <div class="portal-veil" aria-hidden="true"></div>
 
-          <p class="hero-message" style="font-size:clamp(28px,2.7vw,39px);line-height:1.28" data-cms="hero_message">
-            <span data-cms="hero_message_1">Xây hệ thống. Xây đội ngũ.</span>
-            <span data-cms="hero_message_2">Kiến tạo tăng trưởng.</span>
-          </p>
+        <div class="portal-panel left" aria-hidden="true"></div>
+        <div class="portal-panel right" aria-hidden="true"></div>
 
-          <div class="hero-actions">
-            <a class="liquid primary" href="#journey"><span data-cms="hero_cta_1">Khám phá hành trình</span> <span aria-hidden="true">↗</span></a>
-            <a class="liquid ghost" href="#unite"><span data-cms="hero_cta_2">Về Unite Group</span> <span aria-hidden="true">↗</span></a>
-          </div>
+        <span class="portal-dot a" aria-hidden="true"></span>
+        <span class="portal-dot b" aria-hidden="true"></span>
+
+        <div class="portal-word">
+          <!-- h1 cho SEO va trinh doc man hinh. CSS an phan hien thi roi dung
+               .portal-word .word lam phan nhin, nhung DOM van dung cau truc
+               dung: mot the h1, cac doan con lai la span. -->
+          <h1 class="sr-only">Koko Linh — The Visionary Operator, Tổng Giám Đốc Unite Group</h1>
+          <span class="word" aria-hidden="true">
+            <span class="fit-line" data-cms="hero_title_1">KOKO</span><span class="fit-line" data-cms="hero_title_2">LINH<i>.</i></span>
+          </span>
+          <span class="sub" data-cms="hero_message">Xây hệ thống. Xây đội ngũ. Kiến tạo tăng trưởng.</span>
         </div>
 
-        <figure class="hero-portrait">
-          <div class="hero-frame">
-            <img src="assets/images/office-portrait.webp"
-                 alt="Koko Linh trong trang phục vest tại văn phòng"
-                 fetchpriority="high" decoding="async" />
-          </div>
-          <figcaption>
-            <span data-cms="hero_cap_1">Koko Linh</span>
-            <span data-cms="hero_cap_2">The Visionary Operator</span>
-          </figcaption>
-        </figure>
-      </div>
+        <p class="portal-note tl" data-cms="hero_kicker">Tổng Giám Đốc · Unite Group / 2026</p>
+        <p class="portal-note tr">Field notes<br><span class="teal">Vol. 01</span></p>
+        <p class="portal-note bl" data-cms="hero_footer">Build clearly · Move intentionally</p>
+        <p class="portal-note br"><span data-cms="hero_scroll">Scroll to enter</span> <span aria-hidden="true">↓</span></p>
 
-      <div class="hero-footer">
-        <span data-cms="hero_footer">Tầm nhìn · Con người · Thực thi</span>
-        <a class="hero-scroll" href="#manifesto"><span data-cms="hero_scroll">Khám phá tiếp</span> <span aria-hidden="true">↓</span></a>
+        <div class="portal-cta">
+          <a class="liquid primary" href="#journey"><span data-cms="hero_cta_1">Khám phá hành trình</span> <span aria-hidden="true">↗</span></a>
+          <a class="liquid ghost" href="#unite"><span data-cms="hero_cta_2">Về Unite Group</span> <span aria-hidden="true">↗</span></a>
+        </div>
       </div>
     </section>
 
@@ -490,6 +491,7 @@
   <!-- text-fit.js đo bề rộng chữ thật nên phải chạy sau khi CSS nạp xong.
        Không dùng defer ở đây để bảo đảm thứ tự với app.js. -->
   <script src="js/text-fit.js"></script>
+  <script defer src="js/portal.js"></script>
   <script defer src="js/shader.js"></script>
   <script defer src="js/app.js"></script>
 

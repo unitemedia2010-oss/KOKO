@@ -15,42 +15,53 @@
    1. BIẾN MÀU & FONT
    ========================================================================== */
 :root {
-  /* nền & chữ */
-  --bg: #090909;
-  --bg-soft: #101010;
-  --card: #151515;
-  --text: #f2efe8;
-  --muted: #9b9791;          /* nâng từ #94918d để đạt tương phản AA */
-  --line: rgba(255,255,255,.12);
-  --line-strong: rgba(255,255,255,.24);
+  /* ==========================================================================
+     BANG MAU — theo ban mau: nen than gan den, nhan bang ho phach (amber)
+     va xanh lam-teal. Ban cu dung wine do; doi sang ho phach cho cam giac
+     sach, hien dai va bot nang ne hon.
 
-  /* màu thương hiệu
-     --wine       : dùng làm NỀN (nút, gradient, thẻ màu). Giữ đậm để có sức nặng.
-     --wine-text  : dùng làm CHỮ. Trên nền tối phải sáng hơn --wine, nếu không
-                    chữ đỏ nhỏ (9-10px) sẽ không đạt chuẩn WCAG AA.
-     Tách hai biến này ra là để không phải hy sinh độ đậm của nút chỉ vì chữ. */
-  --wine: #ba1126;
-  --wine-2: #7c1724;
-  --wine-bright: #e3243e;
-  /* #d9455e vừa đủ 4.5:1 nhưng sát ngưỡng quá, sai số làm tròn của công cụ
-     kiểm tra có thể báo lỗi. #e0566d cho dư biên, nhìn vẫn đậm và sang trọng. */
-  --wine-text: #e0566d;
+     Tach ro hai vai tro, vi day la cho de sai:
+       --amber / --teal : mau NEN (nut, the, diem nhan lon)
+       --amber-text / --teal-text : mau CHU nho (9-11px)
+     Tren nen toi, chu dung mau nen se khong du tuong phan WCAG AA, nen
+     bien danh cho chu phai sang hon.
+     ========================================================================== */
+  --bg: #0a0c0e;
+  --bg-soft: #101317;
+  --card: #15191d;
+  --text: #ede7dc;
+  --muted: #a3aaad;
+  --line: rgba(237,231,220,.13);
+  --line-strong: rgba(237,231,220,.26);
 
-  /* màu kim — dùng cho ánh sáng, không dùng cho chữ chữa trên nền tối */
-  --gold: #d4af6a;
-  --gold-soft: #e8cf9b;
-  --gold-deep: #a8853f;
-  --gold-glow: rgba(212,175,106,.28);
+  --amber: #e8913c;
+  --amber-2: #c4762a;
+  --amber-text: #f0a355;      /* sang hon --amber de chu nho du tuong phan */
+  --amber-glow: rgba(232,145,60,.26);
+
+  --teal: #3d8a92;
+  --teal-2: #2e6b72;
+  --teal-text: #5fb3bc;
+
+  /* Giu ten cu de cac rule da viet khong bi gay. */
+  --wine: var(--amber);
+  --wine-2: var(--amber-2);
+  --wine-bright: var(--amber-text);
+  --wine-text: var(--amber-text);
+  --gold: var(--amber);
+  --gold-soft: #f2c893;
+  --gold-deep: var(--amber-2);
+  --gold-glow: var(--amber-glow);
 
   --paper: #e8e0d5;
-  --shadow: 0 30px 80px rgba(0,0,0,.35);
+  --shadow: 0 30px 80px rgba(0,0,0,.4);
 
-  /* phông */
-  --serif: "Cormorant Garamond", Georgia, serif;
-  --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --display: Montserrat, Inter, sans-serif;
+  /* PHONG — Sora cho chu chua, Syne cho tieu de.
+     Syne co net chu rong va la, hop kieu editorial hien dai hon Montserrat. */
+  --serif: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Sora", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --display: "Syne", "Sora", sans-serif;
 
-  /* nhịp chuyển động */
   --ease-out: cubic-bezier(.2,.7,.2,1);
   --ease-soft: cubic-bezier(.65,0,.35,1);
 }
@@ -65,14 +76,23 @@ html[data-theme="light"] {
   --line-strong: rgba(0,0,0,.24);
   --shadow: 0 30px 70px rgba(72,51,45,.13);
 
-  /* Trên nền sáng, đỏ gốc đã đủ tương phản nên không cần sáng thêm */
-  --wine-text: #9c0d1e;
+  /* ======================================================================
+     NEN SANG — mau phai DAm lai moi du tuong phan WCAG AA cho chu nho.
+     Da do bang may, khong doan:
+       nen giay #e8e0d5
+       --amber-text #a8631f  -> 3.59  (khong du)
+       --amber-ink  #8f5219  -> 4.74  (dat)
+     Giu nguyen sac ho phach nau, khong bien thanh nau den.
+     ====================================================================== */
+  --amber-text: #8f5219;
+  --amber-ink: #8f5219;
+  --teal-text: #2f6870;
+  --teal-ink: #27595f;
 
-  /* trên nền sáng, gold phải đậm lại mới đủ tương phản */
-  --gold: #8a6a22;
-  --gold-soft: #a8853f;
-  --gold-deep: #6d5319;
-  --gold-glow: rgba(138,106,34,.18);
+  --gold: #8f5219;
+  --gold-soft: #9c5a1c;
+  --gold-deep: #6b3d12;
+  --gold-glow: rgba(143,82,25,.18);
 }
 
 /* ==========================================================================
@@ -582,8 +602,11 @@ html[data-theme="light"] .operator-copy p { color: #5e5556; }
    13. CASE STUDY
    ========================================================================== */
 .case-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 56px; }
-.case-head h2 { margin: 0; font: 900 clamp(64px, 9vw, 142px)/.78 var(--display); letter-spacing: -.075em; text-transform: uppercase; }
-.case-head p { max-width: 420px; margin: 0 0 7px; color: var(--muted); line-height: 1.7; text-wrap: pretty; }
+/* Tieu de co the rong bang chieu ngang khung, neu khong chan thi no day
+   con lai khong du va doan van ben canh bi ep con lai vai chuc px.
+   min-width:0 + flex co dinh la cach chuan de hai ben khong chen nhau. */
+.case-head h2 { margin: 0; flex-shrink: 1; min-width: 0; font: 900 clamp(64px, 9vw, 142px)/.78 var(--display); letter-spacing: -.075em; text-transform: uppercase; }
+.case-head p { flex: 0 0 auto; min-width: 0; max-width: 420px; margin: 0 0 7px; color: var(--muted); line-height: 1.7; text-wrap: pretty; }
 
 .case-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
 .case-card {
@@ -645,12 +668,17 @@ html[data-theme="light"] .operator-copy p { color: #5e5556; }
    15. POINT OF VIEW
    ========================================================================== */
 .pov { background: var(--paper); color: #121212; }
-/* Section này nền sáng, nên dùng đỏ đậm --wine gốc thay vì --wine-text */
-.pov .eyebrow { color: var(--wine); }
-.pov .eyebrow::before { background: var(--wine); }
+/* Section này nền giấy sáng, nên phải dùng biến chữ đậm hơn.
+   --amber-text trên nền tối đã sáng đủ, nhưng đặt lên nền sáng sẽ
+   không đạt chuẩn AA (tỉ lệ chỉ 1.88). Vì vậy dùng --amber-2.
+   Tương tự với --teal. */
+.pov .eyebrow { color: var(--amber-ink); }
+.pov .eyebrow::before { background: var(--amber-ink); }
 .pov-head { display: flex; justify-content: space-between; gap: 40px; align-items: end; }
-.pov-head h2 { margin: 0; font: 900 clamp(72px, 11vw, 170px)/.8 var(--display); letter-spacing: -.08em; text-transform: uppercase; }
-.pov-head p { max-width: 380px; color: #5f5952; line-height: 1.7; text-wrap: pretty; }
+/* Syne rong hon phong cu, nen tieu de de day het choi. Khong chan thi
+   doan van ben canh bi ep tu 380px xuong con 82px. */
+.pov-head h2 { margin: 0; flex-shrink: 1; min-width: 0; font: 900 clamp(72px, 11vw, 170px)/.8 var(--display); letter-spacing: -.08em; text-transform: uppercase; }
+.pov-head p { flex: 0 0 auto; min-width: 0; max-width: 380px; color: #5f5952; line-height: 1.7; text-wrap: pretty; }
 
 .pov-list { margin-top: 60px; border-top: 1px solid rgba(0,0,0,.18); }
 .pov-item {
@@ -660,7 +688,7 @@ html[data-theme="light"] .operator-copy p { color: #5e5556; }
   transition: background .3s ease;
 }
 .pov-item:hover { background: rgba(255,255,255,.45); }
-.pov-item .idx { font: 700 12px/1 var(--display); color: var(--wine); }
+.pov-item .idx { font: 700 12px/1 var(--display); color: var(--amber-ink); }
 .pov-item h3 { margin: 0; font: 500 clamp(31px, 4vw, 55px)/1.05 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
 .pov-item span:last-child { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #6b625a; white-space: nowrap; }
 
@@ -688,8 +716,8 @@ html[data-theme="light"] .operator-copy p { color: #5e5556; }
    17. GALLERY
    ========================================================================== */
 .gallery-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 48px; }
-.gallery-head h2 { margin: 0; font: 800 clamp(48px, 6vw, 88px)/.9 var(--display); letter-spacing: -.06em; text-transform: uppercase; }
-.gallery-head p { color: var(--muted); max-width: 420px; line-height: 1.7; text-wrap: pretty; }
+.gallery-head h2 { margin: 0; flex-shrink: 1; min-width: 0; font: 800 clamp(48px, 6vw, 88px)/.9 var(--display); letter-spacing: -.06em; text-transform: uppercase; }
+.gallery-head p { flex: 0 0 auto; min-width: 0; color: var(--muted); max-width: 420px; line-height: 1.7; text-wrap: pretty; }
 
 .gallery-grid { display: grid; grid-template-columns: 1.15fr .85fr .85fr; grid-template-rows: 330px 330px; gap: 16px; }
 .gallery-item { overflow: hidden; position: relative; background: var(--card); }

@@ -10,10 +10,12 @@
   const r1 = await p.evaluate(() => {
     const all = Array.from(document.querySelectorAll('.reveal,.reveal-left,.reveal-right,[data-stagger] > *'));
     const an = all.filter(e => parseFloat(getComputedStyle(e).opacity) < 0.05);
-    const chu = document.querySelector('.hero-copy h1 .fit-line').textContent.trim();
-    const fs = getComputedStyle(document.querySelector('.hero-copy h1 .fit-line')).fontSize;
+    /* Hero da doi sang hieu ung "cong mo", nen do tieu de portal thay vi h1. */
+    const tie = document.querySelector('.portal-word .word');
     return { loi: 'GSAP bi chan', soPhanTu: all.length, biAn: an.length,
-             mau: an.slice(0,3).map(e=>e.className.slice(0,30)), heroChu: chu, heroSize: fs };
+             mau: an.slice(0,3).map(e=>e.className.slice(0,30)),
+             heroChu: tie ? tie.textContent.trim().slice(0, 20) : 'KHONG TIM THAY',
+             heroSize: tie ? getComputedStyle(tie).fontSize : 'n/a' };
   });
   console.log(JSON.stringify(r1));
   await p.screenshot({ path: 'khoa/khong-gsap.png' });

@@ -5,15 +5,19 @@
    phông mới lên, nên toàn bộ khai báo @font-face nên nằm ở đây.
 
    Ba biến font quan trọng (khai báo trong style.css):
-     --serif   : phông chữ có chân, dùng cho câu văn và pull-quote
-     --sans    : phông chữ không chân, dùng cho nội dung chữa
-     --display : phông chữ tiêu đề lớn, dạng sans-serif đậm
+     --sans    : chữ chữa — Sora, dễ đọc, có đủ dấu tiếng Việt
+     --serif   : trước đây là phông có chân; nay cùng --sans vì bản mẫu mới
+                 bỏ phông chữ có chân
+     --display : tiêu đề — Syne, nét rộng lạ, kiểu editorial hiện đại
 
    Đổi phông = đổi giá trị 3 biến trên. Không cần sửa file HTML.
    ========================================================================== */
 
-/* ---- Phông nền, tải từ Google Fonts ---- */
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap");
+/* ---- Phông nền, tải từ Google Fonts ----
+   Syne không có đủ bộ dấu tiếng Việt cho mọi trọng số, nên thêm
+   Noto Sans Vietnamese dự phòng phía sau để chữ tiếng Việt không bị
+   thiếu nét hoặc rơi về phông hệ thống. */
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=Noto+Sans:wght@400;500;600&display=swap");
 
 /* ==========================================================================
    KHU VỰC DÀNH CHO PHÔNG TẢI LÊN (CMS sẽ chèn tự động vào đây)
