@@ -3,79 +3,185 @@
    --------------------------------------------------------------------------
    VÌ SAO CẦN FILE NÀY
    clamp() chỉ dựa trên chiều rộng khung chứa, không biết chữ dài bao nhiêu.
-   Cùng một khung 400px nhưng "TỔNG GIÁM ĐỐC" và "CEO" chiếm độ rộng rất khác,
-   nên clamp() có thể để chữ tràn ra ngoài hoặc thu nhỏ quá mức.
+   Cùng một khung 500px nhưng "CHUYÊN VIÊN TƯ VẤN" và "SIDE." chiếm độ rộng
+   rất khác, nên clamp() có thể để chữ tràn ra ngoài.
 
-   Cách ở đây: đo bề rộng chữ THẬT, rồi nhân dần font-size cho tới khi vừa khít.
-   Nhờ vậy tiêu đề luôn nằm gọn trong khung ở mọi kích thước màn hình và mọi
-   font — kể cả font bạn tải lên từ CMS.
+   CÁCH Ở ĐÂY
+   Đo bề rộng chữ THẬT, rồi nhân tất cả các dòng của cùng một tiêu đề theo
+   MỘT tỉ lệ chung, cho tới khi dòng dài nhất vừa khung.
+
+   ⚠ VÌ SAO PHẢI CHUNG TỈ LỆ
+   Bản đầu tiên co TỪNG DÒNG RIÊNG, khiến dòng ngắn bị kéo giãn hết chiều
+   ngang. "The human / side." trở thành "THE HUMAN" nhỏ và "SIDE." khổng lồ,
+   mất hẳn nhịp thị giác. Tiêu đề nhiều dòng phải giữ nguyên quan hệ cỡ chữ
+   giữa các dòng, nên chỉ dòng DÀI NHẤT quyết định tỉ lệ, các dòng còn lại
+   đi theo.
 
    CÁCH DÙNG
-     <h2 class="fit-line">Tiêu đề dài bất kỳ</h2>
+     <h2>
+       <span class="fit-line">Dòng một</span>
+       <span class="fit-line">Dòng hai</span>
+     </h2>
 
-   Ghi chú
-   - Chạy lại khi: đổi kích thước cửa sổ, đổi theme, và sau khi font tải xong
-     (đây là lý do quan trọng nhất: nếu đo trước khi font có, phép đo sẽ sai).
+   Các dòng được gom theo phần tử cha chung, nên mọi .fit-line cùng một
+   <h1>/<h2> sẽ luôn dùng chung tỉ lệ.
    ========================================================================== */
 (function () {
   'use strict';
 
-  var MIN_RATIO = 0.72;   // không bao giờ co nhỏ hơn 72% cỡ gốc
+  var MIN_RATIO = 0.72;   // không co nhỏ hơn 72% cỡ thiết kế
   var PRECISION = 0.5;    // sai số chấp nhận được, tính bằng px
 
-  /* Chạy sau khi trình duyệt đã vẽ xong khung hình, để không chặn lần vẽ đầu */
+  /* Tiêu đề nhiều dòng thường CỐ Ý dùng cỡ khác nhau giữa các dòng, ví dụ
+     "The human" (lớn) rồi "side." (nhỏ hơn, lệch xuống). Đó là thiết kế,
+     không phải lỗi. Thuộc tính data-fit-scale ghi lại tỉ lệ cỡ chữ mong
+     muốn của từng dòng so với dòng gốc:
+        data-fit-scale="1"    — cùng cỡ với dòng dài nhất (mặc định)
+        data-fit-scale="0.72" — nhỏ hơn có chủ đích
+     Khi co, mọi dòng cùng nhân một hệ số, nên giữ nguyên sự khác biệt này.
+     Nếu bỏ qua, mọi dòng bị ép về cùng cỡ và nhịp thị giác vỡ. */
+
+  /* Chạy sau khi trình duyệt vẽ xong khung hình, để không chặn lần vẽ đầu */
   var schedule = function (fn) {
     if (window.requestAnimationFrame) window.requestAnimationFrame(fn);
     else setTimeout(fn, 60);
   };
 
+  /* Bỏ mọi font-size đã đặt tay, đặt tạm về cỡ thiết kế, trả về bề rộng
+     của từng dòng.
+     Bắt buộc phải xoá trước khi đo, nếu không sẽ đo trên kết quả của lần
+     trước và co chữ ngày một chạy về 0. */
+  function doRongGoc(nhom, coGoc, tyLe) {
+    var rong = [];
+    for (var i = 0; i < nhom.length; i++) {
+      nhom[i].style.fontSize = '';
+      /* Cỡ thiết kế lấy từ thẻ tiêu đề (cha sâu hơn một cấp) nên phải đặt
+         tường minh, vì font-size:inherit không tự nhận giá trị đó. */
+      nhom[i].style.fontSize = (coGoc * (tyLe ? tyLe[i] : 1)).toFixed(2) + 'px';
+      rong.push(nhom[i].scrollWidth);
+      nhom[i].style.fontSize = '';
+    }
+    return rong;
+  }
+
   /**
-   * Co một phần tử cho vừa bề rộng khung chứa.
-   * @param {HTMLElement} el phần tử có .fit-line
+   * Lấy cỡ chữ THIẾT KẾ của tiêu đề, không phải cỡ sau khi bị co.
+   *
+   * Vì sao phải tìm "cha thật": .fit-line dùng font-size:inherit nên lấy cỡ
+   * từ cha trực tiếp. Nhưng .contact h2 có class fit-line ngay trên thẻ h2,
+   * nên phần tử cha lại là div (16px). Nếu lấy cỡ của cha, ta sẽ co tiêu đề
+   * 153px xuống còn 16px. Vì vậy phải dò lên tìm phần tử cha có cỡ chữ lớn
+   * — tức là tiêu đề thật sự mang nội dung.
    */
-  function fitOne(el) {
-    if (!el || !el.isConnected) return;
+  function coThietKe(nhom) {
+    var phanTu = nhom[0];
+    while (phanTu && phanTu !== document.body) {
+      var tag = phanTu.tagName;
+      if (/^H[1-6]$/.test(tag)) {
+        var size = parseFloat(getComputedStyle(phanTu).fontSize);
+        if (size && isFinite(size)) return size;
+      }
+      phanTu = phanTu.parentElement;
+    }
+    /* Không tìm thấy thẻ tiêu đề: lấy cỡ của cha */
+    return parseFloat(getComputedStyle(nhom[0]).fontSize);
+  }
 
-    /* Không có nội dung hoặc đang bị ẩn thì bỏ qua, tránh đo nhầm */
-    if (!el.textContent.trim()) return;
-    if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') return;
+  /**
+   * Co một nhóm dòng (cùng thuộc một tiêu đề) cho vừa khung.
+   * @param {HTMLElement[]} nhom các .fit-line dùng chung phần tử cha
+   */
+  function fitNhom(nhom) {
+    if (!nhom || !nhom.length) return;
 
-    var parent = el.parentElement;
-    if (!parent) return;
+    var cha = nhom[0].parentElement;
+    if (!cha) return;
 
-    /* Chừa 1px mỗi bên để tránh vòng lặp vô hạn do làm tròn số thực */
-    var available = parent.clientWidth - 2;
+    /* Bỏ qua nếu tiêu đề đang ẩn — đo lúc đó ra số 0 rồi co nhầm */
+    if (!nhom[0].textContent.trim()) return;
+    if (nhom[0].offsetParent === null) return;
+
+    /* Khung đo: dùng khả năng chứa thật của khối tiêu đề */
+    var khung = cha.getBoundingClientRect();
+    var available = Math.min(cha.clientWidth, khung.width) - 2;
     if (available <= 0) return;
 
-    var baseSize = parseFloat(getComputedStyle(el).fontSize);
-    if (!baseSize || !isFinite(baseSize)) return;
+    var coGoc = coThietKe(nhom);
+    if (!coGoc || !isFinite(coGoc) || coGoc <= 0) return;
 
-    /* Nếu vừa khít rồi thì không cần làm gì — trường hợp phổ biến nhất */
-    if (el.scrollWidth <= available + PRECISION) {
-      el.style.fontSize = '';
+    /* Tỉ lệ thiết kế của từng dòng so với cỡ gốc (mặc định là 1) */
+    var tyLe = [];
+    for (var t = 0; t < nhom.length; t++) {
+      var s = parseFloat(nhom[t].getAttribute('data-fit-scale'));
+      tyLe.push(isFinite(s) && s > 0 ? s : 1);
+    }
+
+    /* Đo bề rộng ở đúng cỡ thiết kế của từng dòng, không phải cỡ hiện tại */
+    var rongGoc = doRongGoc(nhom, coGoc, tyLe);
+
+    /* Dòng vừa khung nhất quyết định cả khối co bao nhiêu */
+    var daiNhat = 0;
+    for (var i = 0; i < rongGoc.length; i++) {
+      if (rongGoc[i] > daiNhat) daiNhat = rongGoc[i];
+    }
+
+    /* Vừa khít rồi thì giữ nguyên cỡ thiết kế — trường hợp phổ biến nhất */
+    if (daiNhat <= available + PRECISION) {
+      /* Vẫn phải áp lại tỉ lệ thiết kế cho các dòng nhỏ hơn có chủ đích */
+      for (var z = 0; z < nhom.length; z++) {
+        if (tyLe[z] !== 1) nhom[z].style.fontSize = (coGoc * tyLe[z]).toFixed(2) + 'px';
+      }
       return;
     }
 
-    var ratio = Math.max(MIN_RATIO, available / el.scrollWidth);
-
-    /* Tìm chính xác hơn bằng tìm nhị phân, tránh chữ vừa khít bị cắt 1px */
+    /* Tìm chính xác bằng tìm nhị phân */
     var low = MIN_RATIO;
     var high = 1;
-    var best = ratio;
-    for (var i = 0; i < 6; i++) {
+    var heSo = available / daiNhat;
+
+    for (var lan = 0; lan < 8; lan++) {
       var mid = (low + high) / 2;
-      el.style.fontSize = (baseSize * mid).toFixed(2) + 'px';
-      if (el.scrollWidth <= available + PRECISION) { best = mid; low = mid; }
+      for (var k = 0; k < nhom.length; k++) {
+        nhom[k].style.fontSize = (coGoc * tyLe[k] * mid).toFixed(2) + 'px';
+      }
+      var rongHienTai = 0;
+      for (var j = 0; j < nhom.length; j++) {
+        if (nhom[j].scrollWidth > rongHienTai) rongHienTai = nhom[j].scrollWidth;
+      }
+      if (rongHienTai <= available + PRECISION) { heSo = mid; low = mid; }
       else { high = mid; }
     }
 
-    /* best luôn >= MIN_RATIO, kể cả khi chữ quá dài — ưu tiên giữ độ rộng chữ */
-    el.style.fontSize = (baseSize * best).toFixed(2) + 'px';
+    /* Chặn dưới MIN_RATIO: chữ quá dài thì ưu tiên giữ khả năng đọc
+       thay vì thu nhỏ tới mức không ai đọc nổi. Khung còn chặn tràn ngang. */
+    if (heSo < MIN_RATIO) heSo = MIN_RATIO;
+
+    /* Mọi dòng nhân CÙNG một hệ số, nên sự khác biệt cỡ chữ có chủ đích
+       được giữ nguyên — đây là điều bản co-đồng-loạt-trước đây làm mất. */
+    for (var m = 0; m < nhom.length; m++) {
+      nhom[m].style.fontSize = (coGoc * tyLe[m] * heSo).toFixed(2) + 'px';
+    }
   }
 
+  /** Gom các .fit-line theo phần tử cha, rồi co từng nhóm. */
   function fitAll() {
-    var nodes = document.querySelectorAll('.fit-line');
-    for (var i = 0; i < nodes.length; i++) fitOne(nodes[i]);
+    var tatCa = document.querySelectorAll('.fit-line');
+    var nhom = [];
+    var index = [];
+
+    for (var i = 0; i < tatCa.length; i++) {
+      var cha = tatCa[i].parentElement;
+      if (!cha) continue;
+      var viTri = index.indexOf(cha);
+      if (viTri === -1) {
+        index.push(cha);
+        nhom.push([tatCa[i]]);
+      } else {
+        nhom[viTri].push(tatCa[i]);
+      }
+    }
+
+    for (var j = 0; j < nhom.length; j++) fitNhom(nhom[j]);
   }
 
   /* ---------------------------------------------------------------------
