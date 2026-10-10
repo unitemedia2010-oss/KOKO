@@ -215,7 +215,31 @@ kiem('thieu payload: bao loi cu the', () => {
   doiChieu(o.ok, false, 'phai bao loi');
 });
 
+console.log('\n=== 3b. action verify (dung cho che do sua truc tiep) ===');
+
+kiem('verify: mat khau dung, khong ghi gi vao Sheet', () => {
+  const r = goi({ action: 'verify', callback: 'cb', payload: JSON.stringify({ password: MK }) });
+  doiChieu(r.mime, 'text/javascript', 'phai tra JSONP');
+  const o = JSON.parse(r.noiDung.replace(/^cb\(/, '').replace(/\);$/, ''));
+  doiChieu(o.ok, true, 'ok: ' + (o.message || ''));
+});
+
+kiem('verify: mat khau sai, tra loi qua JSONP', () => {
+  const r = goi({ action: 'verify', callback: 'cb', payload: JSON.stringify({ password: 'sai' }) });
+  doiChieu(r.mime, 'text/javascript', 'phai tra JSONP');
+  const o = JSON.parse(r.noiDung.replace(/^cb\(/, '').replace(/\);$/, ''));
+  doiChieu(o.ok, false, 'phai bao loi');
+  if (!o.message || o.message.indexOf('không đúng') === -1) throw new Error('thong bao sai: ' + o.message);
+});
+
+kiem('verify: thieu payload, bao loi cu the', () => {
+  const r = goi({ action: 'verify', callback: 'cb' });
+  const o = JSON.parse(r.noiDung.replace(/^cb\(/, '').replace(/\);$/, ''));
+  doiChieu(o.ok, false, 'phai bao loi');
+});
+
 console.log('\n=== 4. upload qua GET + payload ===');
+
 
 const b64 = Buffer.alloc(2048, 5).toString('base64');
 

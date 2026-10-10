@@ -161,6 +161,21 @@ function doGet(e) {
     }
   }
 
+  // Kiem tra mat khau ma khong ghi gi. Trang admin goi action nay luc
+  // dang nhap de bao dam nguoi nhap that su co quyen sua.
+  if (action === 'verify') {
+    if (!prm.payload) {
+      return traKiemTra_(callback, { ok: false, message: 'Thieu du lieu (payload).' });
+    }
+    try {
+      const duLieu = JSON.parse(prm.payload);
+      kiemTraMatKhau_(duLieu);
+      return traKiemTra_(callback, { ok: true, message: 'Mat khau dung.' });
+    } catch (err) {
+      return traKiemTra_(callback, loi_(err));
+    }
+  }
+
   if (action === 'listimages') {
     return traKiemTra_(callback, { ok: true, images: docAnhDaTai_() });
   }
@@ -172,7 +187,7 @@ function doGet(e) {
   return traKiemTra_(callback, {
     ok: true,
     message: 'KOKO CMS API',
-    actions: ['health', 'getData', 'cmsSave', 'uploadFont', 'uploadImage', 'deleteImage', 'listImages', 'listFonts']
+    actions: ['health', 'verify', 'getData', 'cmsSave', 'uploadFont', 'uploadImage', 'deleteImage', 'listImages', 'listFonts']
   });
 }
 
@@ -207,6 +222,11 @@ function doPost(e) {
 
     if (action === 'uploadimage') {
       return traKiemTra_(callback, taiAnhLen_(payload));
+    }
+
+    if (action === 'verify') {
+      kiemTraMatKhau_(payload);
+      return traKiemTra_(callback, { ok: true, message: 'Mat khau dung.' });
     }
 
     if (action === 'listimages') {
