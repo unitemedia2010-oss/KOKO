@@ -113,6 +113,18 @@ Phải hiện ra đúng một dòng bắt đầu bằng `kc(` và trong đó có
 - Nếu báo lỗi 404 → URL copy thiếu hoặc thừa ký tự.
 - Nếu báo `{"ok":false,...}` → xem lại Bước 2.
 
+Rồi kiểm tra tiếp phần xác nhận mật khẩu (thiếu bước này thì không đăng nhập được):
+
+```
+https://script.google.com/macros/s/ĐƯỜNG_DẪN_CỦA_BẠN/exec?action=verify&callback=kc&payload=%7B%22password%22%3A%22SAI%22%7D
+```
+
+Phải hiện `kc({"ok":false,"xacNhan":false,...})`.
+
+> Nếu hiện `"ok":true` ở bước này, nghĩa là backend của bạn **chưa có action
+> `verify`** — và mọi mật khẩu đều sẽ vào được. Trang quản trị báo lỗi thay
+> vì để lọt. Hãy làm lại Bước 1 và Bước 4.
+
 ---
 
 ## Bước 5 — Nối URL vào trang quản trị
@@ -227,6 +239,11 @@ URL sai, hoặc deployment chưa đặt quyền **Anyone`. Kiểm tra lại Bư�
 
 **Kiểm tra URL nhanh nhất**
 Mở `URL_CUA_BAN?action=health&callback=kc`. Phải thấy `kc({...})`.
+
+**Báo "Apps Script chưa có chế độ xác nhận"**
+Backend trên hosting chưa được deploy lại sau khi thêm action `verify`.
+Làm lại Bước 1 và Bước 4. Trang này **cố tình từ chối** thay vì để lọt —
+nếu không thì mọi mật khẩu đều vào được, vì thông tin sức khoẻ cũng có `ok:true`.
 
 **Báo "Chưa đặt mật khẩu quản trị"**
 Chưa làm Bước 2, hoặc tên thuộc tính gõ sai chính tả.

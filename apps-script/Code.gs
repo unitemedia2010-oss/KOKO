@@ -170,7 +170,7 @@ function doGet(e) {
     try {
       const duLieu = JSON.parse(prm.payload);
       kiemTraMatKhau_(duLieu);
-      return traKiemTra_(callback, { ok: true, message: 'Mat khau dung.' });
+      return traKiemTra_(callback, { ok: true, xacNhan: true, message: 'Mat khau dung.' });
     } catch (err) {
       return traKiemTra_(callback, loi_(err));
     }
@@ -226,7 +226,7 @@ function doPost(e) {
 
     if (action === 'verify') {
       kiemTraMatKhau_(payload);
-      return traKiemTra_(callback, { ok: true, message: 'Mat khau dung.' });
+      return traKiemTra_(callback, { ok: true, xacNhan: true, message: 'Mat khau dung.' });
     }
 
     if (action === 'listimages') {

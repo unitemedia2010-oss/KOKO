@@ -35,8 +35,8 @@ async function fakeBackend(page) {
 
     if (action === 'verify') {
       duLieu = payload.password === MK
-        ? { ok: true, message: 'Mat khau dung.' }
-        : { ok: false, message: 'Mật khẩu quản trị không đúng.' };
+        ? { ok: true, xacNhan: true, message: 'Mat khau dung.' }
+        : { ok: false, xacNhan: false, message: 'Mật khẩu quản trị không đúng.' };
     } else if (action === 'getdata') {
       duLieu = { ok: true, content: NOIDUNG_GIA || {} };
     } else if (action === 'cmssave') {
@@ -150,9 +150,39 @@ let DA_LUU = [];
     await p.close();
   });
 
+  await kiem('backend CU tra ok:true cho action verify: phai tu choi', async () => {
+    /* Đây là lỗ hổng thật đã gặp. Khi Code.gs chưa được deploy lại,
+       action 'verify' không tồn tại nên Apps Script rơi xuống nhánh
+       trả thông tin sức khoẻ — vốn cũng có ok:true. Nếu chỉ kiểm tra
+       ok === true thì MỌI MẬT KHẨU đều vào được. Phải đòi nhãn xacNhan. */
+    const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    await p.route('**/script.google.com/**', route => {
+      const u = new global.URL(route.request().url());
+      const cb = u.searchParams.get('callback') || 'cb';
+      /* Giống hệt backend cũ: không có action verify, trả về health */
+      const dl = { ok: true, message: 'KOKO CMS dang hoat dong.', version: 'KOKO_CMS_V2', hoTroJsonp: true };
+      route.fulfill({ status: 200, contentType: 'application/javascript; charset=utf-8',
+                       body: cb + '(' + JSON.stringify(dl) + ');' });
+    });
+    await p.goto(URL + '?edit', { waitUntil: 'load' });
+    await p.waitForTimeout(600);
+    await p.fill('#edPass', 'bat-ky-mat-khau-nao-cung-duoc');
+    await p.click('#edOk');
+    await p.waitForTimeout(1200);
+
+    const r = await p.evaluate(() => ({
+      conLogin: !!document.querySelector('.ed-login'),
+      active: document.documentElement.classList.contains('ed-active'),
+      msg: (document.getElementById('edMsg') || {}).textContent || ''
+    }));
+    doi(r.conLogin, true, 'KHONG duoc mo duoc hop nhap');
+    doi(r.active, false, 'KHONG duoc bat che do sua');
+    phai(/chưa có chế độ xác nhận/i.test(r.msg), 'thong bao phai bao la backend cu, nhan: ' + r.msg);
+    await p.close();
+  });
+
   /* ===================================================== */
   console.log('\n=== 3. Bam de sua ===');
-
   let pageEdit;
 
   await kiem('bam vao chu: bat duoc che do sua', async () => {
@@ -387,6 +417,24 @@ let DA_LUU = [];
     });
     phai(r.soAnh >= 15, 'phai gan khoa cho it nhat 15 anh, nhan ' + r.soAnh);
     doi(r.trung, 0, 'khong duoc co 2 anh cung mot khoa');
+    await p.close();
+  });
+
+  await kiem('khong duot con chu thuaa nao lot ra ngoai the img', async () => {
+    /* Một lần script gan anh da de lai 7 doan "data-cms-img=..."
+       ngay sau the </img>. Chúng la chu that, se hien ra tren trang.
+       Kiem tra bang cach so sanh chu trong body voi chu trong the img. */
+    const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    await p.goto(URL, { waitUntil: 'load' });
+    await p.waitForTimeout(400);
+    const r = await p.evaluate(() => {
+      const sach = document.body.innerText || '';
+      const trongThe = Array.from(document.querySelectorAll('[data-cms-img]'))
+        .map(x => 'data-cms-img="' + x.getAttribute('data-cms-img') + '"').join(' ');
+      const lot = sach.match(/data-cms-img[-=][^\s]*/g) || [];
+      return { lot, coTrongThe: trongThe.length > 0 };
+    });
+    doi(r.lot.length, 0, 'trang dang hien chu thuaa: ' + r.lot.slice(0, 5).join(', '));
     await p.close();
   });
 

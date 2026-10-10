@@ -113,14 +113,20 @@
         msg.textContent = 'Đang kiểm tra…';
         msg.className = 'ed-login-msg';
         goi('verify', { password: mk }).then(function (dl) {
-          if (dl && dl.ok) {
+          /* Bắt buộc phải có đúng nhãn xacNhan.
+             Nếu chỉ kiểm tra ok === true thì khi backend chưa được deploy
+             lại, nó trả về thông tin sức khoẻ cũng có ok:true — và mọi
+             mật khẩu đều qua. Phải đóng cửa, không mở. */
+          if (dl && dl.ok === true && dl.xacNhan === true) {
             ve.remove();
             resolve(mk);
-          } else {
-            msg.textContent = (dl && dl.message) || 'Mật khẩu không đúng.';
-            msg.className = 'ed-login-msg err';
-            input.select();
+            return;
           }
+          msg.textContent = (dl && dl.xacNhan === false)
+            ? (dl.message || 'Mật khẩu quản trị không đúng.')
+            : 'Apps Script chưa có chế độ xác nhận. Xem lại Bước 4 trong docs/huong-dan-cai-dat-cms.md.';
+          msg.className = 'ed-login-msg err';
+          input.select();
         }).catch(function (e) {
           msg.textContent = e.message;
           msg.className = 'ed-login-msg err';

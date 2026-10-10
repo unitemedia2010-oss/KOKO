@@ -217,11 +217,15 @@ kiem('thieu payload: bao loi cu the', () => {
 
 console.log('\n=== 3b. action verify (dung cho che do sua truc tiep) ===');
 
-kiem('verify: mat khau dung, khong ghi gi vao Sheet', () => {
+kiem('verify: mat khau dung, kem nhan xacNhan', () => {
   const r = goi({ action: 'verify', callback: 'cb', payload: JSON.stringify({ password: MK }) });
   doiChieu(r.mime, 'text/javascript', 'phai tra JSONP');
   const o = JSON.parse(r.noiDung.replace(/^cb\(/, '').replace(/\);$/, ''));
   doiChieu(o.ok, true, 'ok: ' + (o.message || ''));
+  /* Tinh mau: phia trinh duyet chi chap nhan khi co nhan nay.
+     Backend cu khong co, no tra thong tin suc khoe cung co ok:true —
+     neu khong doi nhan thi moi mat khau deu lot vao duoc. */
+  doiChieu(o.xacNhan, true, 'thieu nhan xacNhan');
 });
 
 kiem('verify: mat khau sai, tra loi qua JSONP', () => {

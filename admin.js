@@ -99,10 +99,14 @@
          bằng cách đọc lại dữ liệu sau khi ghi.
      ================================================================== */
 
-  function docJSONP(action, cb) {
+  function docJSONP(action, duLieu) {
     return new Promise(function (resolve, reject) {
       var cbName = '__kokoCb' + Math.random().toString(36).slice(2, 11);
-      var url = CFG.backend + '?action=' + encodeURIComponent(action) + '&callback=' + cbName;
+      var url = CFG.backend + '?action=' + encodeURIComponent(action);
+      /* Dữ liệu gửi kèm phải nằm trong chuỗi truy vấn, không nằm trong
+         thân yêu cầu: JSONP chỉ chấp nhận GET. */
+      if (duLieu) url += '&payload=' + encodeURIComponent(JSON.stringify(duLieu));
+      url += '&callback=' + cbName;
       var s = document.createElement('script');
 
       var het = setTimeout(function () {
@@ -212,7 +216,22 @@
       return;
     }
 
-    docJSONP('getdata').then(function (duLieu) {
+    /* Gọi 'verify' chứ không gọi 'getdata'.
+       'getdata' không cần mật khẩu nên gọi nó ở bước đăng nhập là vô
+       nghĩa — mọi mật khẩu đều qua được. Phải là 'verify'.
+       Và phải đòi đúng nhãn xacNhan, vì backend chưa deploy lại sẽ trả
+       về thông tin sức khoẻ cũng có ok:true. */
+    docJSONP('verify', { password: matKhau }).then(function (xacNhan) {
+      if (!(xacNhan && xacNhan.ok === true && xacNhan.xacNhan === true)) {
+        if (xacNhan && xacNhan.xacNhan === false) {
+          throw new Error(xacNhan.message || 'Mật khẩu quản trị không đúng.');
+        }
+        throw new Error('Apps Script chưa có chế độ xác nhận. ' +
+          'Xem lại Bước 4 trong docs/huong-dan-cai-dat-cms.md — có thể bạn chưa deploy lại Code.gs.');
+      }
+
+      return docJSONP('getdata');
+    }).then(function (duLieu) {
       if (!duLieu || duLieu.ok !== true) {
         throw new Error((duLieu && duLieu.message) || 'Apps Script không trả về dữ liệu đúng.');
       }
