@@ -119,7 +119,11 @@ Rồi kiểm tra tiếp phần xác nhận mật khẩu (thiếu bước này th
 https://script.google.com/macros/s/ĐƯỜNG_DẪN_CỦA_BẠN/exec?action=verify&callback=kc&payload=%7B%22password%22%3A%22SAI%22%7D
 ```
 
-Phải hiện `kc({"ok":false,"xacNhan":false,...})`.
+Phải hiện `kc({"ok":false,"message":"Mật khẩu quản trị không đúng."})`.
+
+Còn nếu thay mật khẩu trong `payload` bằng mật khẩu thật thì phải hiện
+`kc({"ok":true,"xacNhan":true,...})`. Chính nhãn `xacNhan` này là thứ trang
+quản trị bắt buộc phải thấy mới cho đăng nhập.
 
 > Nếu hiện `"ok":true` ở bước này, nghĩa là backend của bạn **chưa có action
 > `verify`** — và mọi mật khẩu đều sẽ vào được. Trang quản trị báo lỗi thay
@@ -129,11 +133,16 @@ Phải hiện `kc({"ok":false,"xacNhan":false,...})`.
 
 ## Bước 5 — Nối URL vào trang quản trị
 
-Mở `admin-config.js`, sửa dòng `backend` cho đúng URL vừa copy.
+URL hiện tại đã nằm sẵn trong mã:
 
-Mở `js/editor.js`, sửa `CFG.backend` cho giống hệt.
+| File | Chỗ để sửa |
+|---|---|
+| `js/cms-load.js` | `window.KOKO_CMS.backend` |
+| `admin-config.js` | `backend` |
 
-> Hai chỗ này phải giống nhau, nếu không sẽ lúc sửa được lúc không.
+Hai chỗ phải giống nhau. Chế độ sửa tại chỗ đọc URL từ `cms-load.js` nên
+thường chỉ cần sửa một chỗ là đủ. Sau này deploy lại Apps Script và Google
+cấp URL mới thì sửa cả hai.
 
 ---
 
@@ -151,11 +160,32 @@ thì mới sửa được**. Nếu không có bước này, mọi lệnh sẽ b�
 ```bash
 cd D:/Downloads/KOKO
 git add .
-git commit -m "Thêm chế độ sửa trực tiếp trên trang"
+git commit -m "Cap nhat noi dung"
 git push origin main
 ```
 
 Chờ khoảng 1–2 phút, GitHub Pages dựng lại xong.
+
+---
+
+## Kiểm tra tự động
+
+Bộ kiểm tra chạy trong chính trình duyệt, giả lập backend nên không đụng
+dữ liệu thật:
+
+```bash
+cd D:/Downloads/KOKO
+python -m http.server 8080      # cửa sổ riêng, giữ nguyên
+node tools/kiem-tra-cms-load.js        # trang lấy nội dung từ Sheet
+node tools/kiem-tra-editor.js          # chế độ sửa tại chỗ
+node tools/kiem-tra-dang-nhap-admin.js # cổng đăng nhập + định dạng lưu
+node tools/kiem-tra-jsonp.js           # giao tiếp Apps Script
+node tools/kiem-tra-bo-cuc.js          # không vỡ bố cục ở 8 kích thước
+```
+
+Còn `tools/kiem-tra-that.js` thì chạy thẳng với backend thật trên Google:
+sửa một chữ, lưu, xác nhận Sheet đã đổi, xác nhận trang khách thấy chữ mới,
+rồi **tự trả về giá trị cũ**. Dùng cái này khi nghi ngờ backend có vấn đề.
 
 ---
 
