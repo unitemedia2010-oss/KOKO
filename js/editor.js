@@ -37,7 +37,7 @@
      không thì mới dùng URL ghi trong bản sao bên dưới. */
   var CFG = {
     backend: (window.KOKO_CMS && window.KOKO_CMS.backend) ||
-             'https://script.google.com/macros/s/AKfycbz82msR9fAC2hObTMzb-9WpLTqahEVAoQfUPfk2N6B6YtFp8PY5Nfk98d4vtJBT44Dl/exec',
+             'https://script.google.com/macros/s/AKfycbzH8v1LJ4JdAC-1yvjULiJ4dwSxXp4BL_r7GLeic2G_P0QrQU8q3OAZVR1j9Yn3qPJx/exec',
     duoiGiuDuongDan: ''      // đường dẫn quay lại sau khi thoát chế độ sửa
   };
 
@@ -130,18 +130,21 @@
         msg.textContent = 'Đang kiểm tra…';
         msg.className = 'ed-login-msg';
         goi('verify', { password: mk }).then(function (dl) {
-          /* Bắt buộc phải có đúng nhãn xacNhan.
-             Nếu chỉ kiểm tra ok === true thì khi backend chưa được deploy
-             lại, nó trả về thông tin sức khoẻ cũng có ok:true — và mọi
-             mật khẩu đều qua. Phải đóng cửa, không mở. */
+          /* Phải có đúng nhãn xacNhan mới coi là đăng nhập được.
+             Nếu chỉ kiểm tra ok === true thì khi backend chưa deploy lại,
+             nó trả thông tin sức khoẻ cũng có ok:true — mọi mật khẩu
+             đều lọt. Phải đóng cửa, không mở.
+             Còn ok === false là backend đã đúng bản, chỉ là mật khẩu sai. */
           if (dl && dl.ok === true && dl.xacNhan === true) {
             ve.remove();
             resolve(mk);
             return;
           }
-          msg.textContent = (dl && dl.xacNhan === false)
-            ? (dl.message || 'Mật khẩu quản trị không đúng.')
-            : 'Apps Script chưa có chế độ xác nhận. Xem lại Bước 4 trong docs/huong-dan-cai-dat-cms.md.';
+          if (dl && dl.ok === false) {
+            msg.textContent = dl.message || 'Mật khẩu quản trị không đúng.';
+          } else {
+            msg.textContent = 'Apps Script chưa có chế độ xác nhận. Xem lại Bước 4 trong docs/huong-dan-cai-dat-cms.md.';
+          }
           msg.className = 'ed-login-msg err';
           input.select();
         }).catch(function (e) {

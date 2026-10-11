@@ -25,7 +25,7 @@
   /* Một chỗ duy nhất chứa URL backend cho cả trang lẫn chế độ sửa,
      để không bao giờ phải sửa hai file khác nhau cho cùng một URL. */
   window.KOKO_CMS = {
-    backend: 'https://script.google.com/macros/s/AKfycbz82msR9fAC2hObTMzb-9WpLTqahEVAoQfUPfk2N6B6YtFp8PY5Nfk98d4vtJBT44Dl/exec'
+    backend: 'https://script.google.com/macros/s/AKfycbzH8v1LJ4JdAC-1yvjULiJ4dwSxXp4BL_r7GLeic2G_P0QrQU8q3OAZVR1j9Yn3qPJx/exec'
   };
 
   if (/[?&]edit\b/.test(location.search)) return;   /* chế độ sửa tự lo */

@@ -16,7 +16,7 @@
 
 window.KOKO_ADMIN_CONFIG = {
 
-  backend: 'https://script.google.com/macros/s/AKfycbz82msR9fAC2hObTMzb-9WpLTqahEVAoQfUPfk2N6B6YtFp8PY5Nfk98d4vtJBT44Dl/exec',
+  backend: 'https://script.google.com/macros/s/AKfycbzH8v1LJ4JdAC-1yvjULiJ4dwSxXp4BL_r7GLeic2G_P0QrQU8q3OAZVR1j9Yn3qPJx/exec',
 
   /* Định dạng lưu ký tự có dấu khi tải/xuất tệp */
   thuTuNhom: ['Trang chủ', 'Câu chuyện', 'Hành trình', 'Unite Group', 'Bền vững', 'Kết nối'],

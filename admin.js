@@ -223,7 +223,7 @@
        về thông tin sức khoẻ cũng có ok:true. */
     docJSONP('verify', { password: matKhau }).then(function (xacNhan) {
       if (!(xacNhan && xacNhan.ok === true && xacNhan.xacNhan === true)) {
-        if (xacNhan && xacNhan.xacNhan === false) {
+        if (xacNhan && xacNhan.ok === false) {
           throw new Error(xacNhan.message || 'Mật khẩu quản trị không đúng.');
         }
         throw new Error('Apps Script chưa có chế độ xác nhận. ' +
