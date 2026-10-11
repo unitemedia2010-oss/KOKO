@@ -33,9 +33,11 @@
 
   /* Cấu hình nằm ngay trong file này chứ không tách ra file riêng, để
      người xem bình thường không phải tải thêm một request nào.
-     Đổi URL Apps Script thì sửa ở đây và ở admin-config.js cho khớp. */
+     cms-load.js đặt sẵn window.KOKO_CMS.backend; lấy từ đó cho khớp,
+     không thì mới dùng URL ghi trong bản sao bên dưới. */
   var CFG = {
-    backend: 'https://script.google.com/macros/s/AKfycbz82msR9fAC2hObTMzb-9WpLTqahEVAoQfUPfk2N6B6YtFp8PY5Nfk98d4vtJBT44Dl/exec',
+    backend: (window.KOKO_CMS && window.KOKO_CMS.backend) ||
+             'https://script.google.com/macros/s/AKfycbz82msR9fAC2hObTMzb-9WpLTqahEVAoQfUPfk2N6B6YtFp8PY5Nfk98d4vtJBT44Dl/exec',
     duoiGiuDuongDan: ''      // đường dẫn quay lại sau khi thoát chế độ sửa
   };
 
@@ -78,6 +80,21 @@
   }
 
   /* ---------- 4. Hộp thoại nhập mật khẩu ---------- */
+
+  /* Giữ mật khẩu trong sessionStorage để lưu xong tải lại trang thì
+     không phải nhập lại. Chỉ sống trong phiên đó — đóng trình duyệt
+     là mất, không lưu lâu hơn. Bấm Thoát là xoá ngay. */
+  var KHOA_PHIEN = 'koko-edit-pass';
+
+  function docPhien() {
+    try { return sessionStorage.getItem(KHOA_PHIEN) || ''; } catch (e) { return ''; }
+  }
+  function ghiPhien(mk) {
+    try { if (mk) sessionStorage.setItem(KHOA_PHIEN, mk); } catch (e) { /* im lặng */ }
+  }
+  function quetPhien() {
+    try { sessionStorage.removeItem(KHOA_PHIEN); } catch (e) { /* im lặng */ }
+  }
   function hoiMatKhau() {
     return new Promise(function (resolve) {
       var ve = document.createElement('div');
@@ -163,6 +180,7 @@
     $('#edRevert').addEventListener('click', khoiPhucGoc);
     $('#edExit').addEventListener('click', function () {
       if (Object.keys(st.nhap).length && !confirm('Bạn còn thay đổi chưa lưu. Thoát và bỏ chúng?')) return;
+      quetPhien();
       var u = location.pathname + (CFG.duoiGiuDuongDan || '');
       location.href = u;
     });
@@ -237,12 +255,23 @@
       if (k.indexOf('::') > -1) return;                 /* ảnh xử lý riêng */
       var el = document.querySelector('[data-ed-khoa="' + k + '"]');
       if (!el) return;
-      if (el.textContent !== st.daLuu[k]) { el.textContent = st.daLuu[k]; daAp++; }
+      var nd = st.daLuu[k].replace(/\s+/g, ' ').trim();
+      if (el.textContent !== nd) { el.textContent = nd; daAp++; }
     });
     $$('[data-cms-img]').forEach(function (img) {
       var k = img.getAttribute('data-cms-img');
       if (st.daLuu[k + '::src']) img.setAttribute('src', st.daLuu[k + '::src']);
     });
+
+    /* Dừng ScrollTrigger. Nó gắn vào sự kiện cuộn để chạy hiệu ứng; khi
+       đang gõ chữ thì mỗi lần trình duyệt dịch chuyển vị trí cuộn đều
+       làm nó tính lại toàn bộ — vừa nặng vừa giật. Khi thoát chế độ sửa
+       nó tự chạy lại. */
+    if (window.ScrollTrigger) {
+      try {
+        window.ScrollTrigger.getAll().forEach(function (t) { t.disable(false); });
+      } catch (e) { /* không có gì để dừng */ }
+    }
 
     /* Chữ vừa thay đổi kích thước, cần co lại cho vừa khung */
     if (window.KOKO && window.KOKO.fitText) setTimeout(function () { window.KOKO.fitText(); }, 80);
@@ -255,6 +284,20 @@
   }
 
   /* ---------- 8. Bấm để sửa ---------- */
+
+  /* Chặn ở mousedown chứ không phải ở click.
+     Nếu để trình duyệt tự focus, nó sẽ cuộn ô vào giữa màn hình; trong
+     lúc đó ScrollTrigger lại đang điều chỉnh các hiệu ứng theo vị trí
+     cuộn — hai thứ giành nhau quyền và trang nhảy lên. Đo được 105px.
+     Chặn sớm thì trang đứng yên. */
+  document.addEventListener('mousedown', function (e) {
+    if (!st.quyen || st.busy) return;
+    var o = e.target.closest && e.target.closest('[data-ed-khoa]');
+    if (!o) return;
+    if (e.button !== 0) return;
+    e.preventDefault();
+  }, true);
+
   function batDauSua(el) {
     if (!st.quyen || st.busy) return;
     if (st.dangSua && st.dangSua !== el) ketThucSua();
@@ -264,7 +307,17 @@
        dùng true cho chắc và chặn dán HTML ở sự kiện paste. */
     el.setAttribute('spellcheck', 'false');
     el.classList.add('ed-sua');
-    el.focus();
+
+    /* preventScroll là chốt chặn thứ hai, phòng trường hợp vào ô bằng
+       bàn phím (Tab) chứ không phải bằng chuột. */
+    try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+
+    /* Khoá vị trí cuộn: vài trình duyệt vẫn cuộn kể cả khi có preventScroll,
+       nên nhớ lại rồi trả về đúng chỗ sau khi nó có cơ hội cuộn. */
+    var y = window.scrollY, x = window.scrollX;
+    requestAnimationFrame(function () {
+      if (window.scrollY !== y || window.scrollX !== x) window.scrollTo(x, y);
+    });
 
     var phamVi = el.ownerDocument.createRange();
     phamVi.selectNodeContents(el);
@@ -296,7 +349,14 @@
     if (giaTri === hienTai) delete st.nhap[khoa];
     else st.nhap[khoa] = giaTri;
 
-    capNhatThanhCong();
+    capNhatThanhCong(khoa);
+
+    /* Chữ vừa đổi độ dài: nếu ô này được tự co chữ cho vừa khung thì
+       phải co lại, không thì chữ tràn ra ngoài. Chỉ chạy khi có bộ co
+       chữ, và chạy sau khi trình duyệt kịp vẽ lại. */
+    if (el.classList.contains('fit-line') || el.querySelector('.fit-line')) {
+      if (window.KOKO && window.KOKO.fitText) requestAnimationFrame(function () { window.KOKO.fitText(); });
+    }
   }
 
   /* Bấm vào chữ để sửa; bấm ra ngoài thì kết thúc, không mất gì đã gõ
@@ -350,11 +410,21 @@
     if (e.key === 'Escape') { e.preventDefault(); ketThucSua(); }
   }
 
-  function capNhatThanhCong() {
+  function capNhatThanhCong(chiMotKhoa) {
     var so = Object.keys(st.nhap).length;
     $('#edSave').disabled = so === 0 || st.busy;
     $('#edUndo').disabled = so === 0 || st.busy;
     $('#edCount').textContent = so > 0 ? so + ' chỗ đã sửa' : 'Chưa sửa gì';
+
+    /* Trước đây mỗi lần kết thúc sửa lại quét hết 154 ô để bật/tắt
+       lớp ed-doi. Quét hết không nặng lắm, nhưng nó ép trình duyệt
+       tính lại style cho cả trang. Giờ chỉ đụng vào ô vừa thay đổi;
+       trường hợp không có khoá (bật chế độ lần đầu) mới quét hết. */
+    if (chiMotKhoa !== undefined) {
+      var el = document.querySelector('[data-ed-khoa="' + chiMotKhoa + '"]');
+      if (el) el.classList.toggle('ed-doi', st.nhap[chiMotKhoa] !== undefined);
+      return;
+    }
     $$('[data-ed-khoa]').forEach(function (el) {
       el.classList.toggle('ed-doi', st.nhap[el.getAttribute('data-ed-khoa')] !== undefined);
     });
@@ -390,17 +460,24 @@
     function tiep() {
       if (i2 >= ds.length) {
         st.busy = false;
-        capNhatThanhCong();
         if (thanhCong.ok === ds.length) {
           ds.forEach(function (k) { st.daLuu[k] = st.nhap[k]; });
+
+          /* Ghi vào bộ nhớ trình duyệt: lần mở trang thường tới sẽ
+             thấy ngay nội dung mới, không phải chờ hỏi mạng. */
+          var choNho = {};
+          for (var k2 in st.daLuu) choNho[k2] = st.daLuu[k2];
+          ds.forEach(function (k3) { choNho[k3 + '::src'] = st.daLuu[k3]; });
+          if (window.kokoNhoCMS) window.kokoNhoCMS(choNho);
+
           st.nhap = {};
           baoLoai('ok', 'Đã lưu ' + thanhCong.ok + ' chỗ vào Google Sheets',
-            'Đang tải lại trang để bạn xem kết quả…');
-          setTimeout(function () { location.reload(); }, 1100);
+            'Nội dung mới đã có trên trang này và mọi lượt xem sau.');
         } else {
           baoLoai('err', thanhCong.ok + '/' + ds.length + ' chỗ đã lưu',
             thanhCong.loi[0] || 'Có chỗ không lưu được.');
         }
+        capNhatThanhCong();
         return;
       }
       var khoa = ds[i2];
@@ -448,6 +525,9 @@
         .then(function () {
           if (xong < so) return;
           st.busy = false;
+          /* Xoá luôn bản trong bộ nhớ, không thì trang vẫn hiện nội dung
+             cũ ở lần tải kế tiếp dù Sheet đã trống. */
+          if (window.kokoNhoCMS) window.kokoNhoCMS({});
           baoLoai('ok', 'Đã xoá nội dung đã lưu', 'Đang tải lại trang…');
           setTimeout(function () { location.reload(); }, 1000);
         });
@@ -456,14 +536,21 @@
 
   /* ---------- 10. CSS ---------- */
   var CSS = [
-    /* Vòng sáng khi rê vào chỗ sửa được */
-    '.ed-active [data-ed-khoa]{cursor:text;outline:1px dashed rgba(232,145,60,.55);outline-offset:4px;',
-      'border-radius:2px;transition:background .15s ease,outline-color .15s ease}',
-    '.ed-active [data-ed-khoa]:hover{background:rgba(232,145,60,.13);outline-color:var(--amber,#e8913c)}',
-    '.ed-active [data-ed-khoa].ed-doi{outline-style:solid;background:rgba(232,145,60,.2)}',
-    '.ed-active [data-ed-khoa].ed-sua{outline:2px solid var(--amber,#e8913c);background:rgba(232,145,60,.24);',
-      'cursor:text;box-shadow:0 0 0 4px rgba(232,145,60,.14)}',
+    /* Mặc định KHÔNG vẽ viền. Trang có 154 chỗ sửa được; nếu vẽ viền
+       hết thì nhìn như bản thảo bị gạch chéo, khó đọc và rất nặng.
+       Chỉ lên khoảng trắng khi rê chuột vào. */
+    '.ed-active [data-ed-khoa]{cursor:text;border-radius:3px;transition:background .12s ease}',
+    '.ed-active [data-ed-khoa]:hover{background:rgba(232,145,60,.16);outline:1.5px dashed var(--amber,#e8913c);outline-offset:3px}',
+    /* Đang gõ: nét liền, đậm, dễ thấy */
+    '.ed-active [data-ed-khoa].ed-sua{outline:2px solid var(--amber,#e8913c);outline-offset:3px;',
+      'background:rgba(232,145,60,.1);cursor:text}',
     '.ed-active [data-ed-khoa]:focus{outline:2px solid var(--amber,#e8913c)}',
+    /* Đã sửa nhưng chưa lưu: chỉ đánh dấu bằng nền nhạt, không vẽ viền
+       để không tạo thêm đường kẻ loạn trên trang. */
+    '.ed-active [data-ed-khoa].ed-doi{background:rgba(232,145,60,.22)}',
+    /* Chặn trình duyệt tự cuộn khi bấm vào ô, để không đánh lừa
+       vị trí cuộn và ScrollTrigger tưởng trang bị nhảy. */
+    '.ed-active [data-ed-khoa]:focus-visible{outline:2px solid var(--amber,#e8913c)}',
     /* Ẩnh thanh điều hướng dạng nổi để không che chữ */
     '.ed-on .desktop-floating-menu,.ed-on .mobile-cta,.ed-on .shader-layer{display:none}',
     /* Chừa chỗ ở đáy trang: thanh công cụ ghim cố định không được che nút */
@@ -537,16 +624,35 @@
 
   /* ---------- 11. Khởi động ---------- */
   themGiaoDien();
-  hoiMatKhau().then(function (mk) {
-    if (!mk) { document.documentElement.classList.remove('ed-active'); return; }
-    st.matKhau = mk;
+
+  /* Còn mật khẩu trong phiên thì vào thẳng, khỏi hỏi lại.
+     Quan trọng vì sau khi bấm Lưu trang phải tải lại để thấy kết quả;
+     nếu hỏi lại mật khẩu thì bạn tưởng lưu hỏng. */
+  var daCo = docPhien();
+  if (daCo) {
+    st.matKhau = daCo;
     goi('getdata').then(function (dl) {
-      if (!dl || dl.ok !== true) throw new Error((dl && dl.message) || 'Apps Script không phản hồi đúng.');
+      if (!dl || dl.ok !== true) { quetPhien(); return hoiLai(); }
       bat(dl.content || {});
-    }).catch(function (e) {
-      baoLoai('err', 'Không đọc được nội dung đã lưu', e.message);
-      document.documentElement.classList.remove('ed-active');
+    }).catch(function () { quetPhien(); hoiLai(); });
+  } else {
+    hoiLai();
+  }
+
+  function hoiLai() {
+    hoiMatKhau().then(function (mk) {
+      if (!mk) { document.documentElement.classList.remove('ed-active'); return; }
+      st.matKhau = mk;
+      ghiPhien(mk);
+      goi('getdata').then(function (dl) {
+        if (!dl || dl.ok !== true) throw new Error((dl && dl.message) || 'Apps Script không phản hồi đúng.');
+        bat(dl.content || {});
+      }).catch(function (e) {
+        quetPhien();
+        baoLoai('err', 'Không đọc được nội dung đã lưu', e.message);
+        document.documentElement.classList.remove('ed-active');
+      });
     });
-  });
+  }
 
 })();

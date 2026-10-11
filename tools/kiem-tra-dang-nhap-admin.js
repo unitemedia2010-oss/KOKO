@@ -63,10 +63,83 @@ const URL = 'http://127.0.0.1:8080/admin.html';
     await ctx.close();
   };
 
+  /* Bổ sung: kiểm tra dạng hàm, cho các ca không theo khuôn đăng nhập. */
+  const kiemHam = async (ten, fn) => {
+    try {
+      const r = await fn();
+      if (r === false) throw new Error('tra ve false');
+      console.log('  OK   ' + ten); pass++;
+    } catch (e) {
+      console.log('  LOI  ' + ten + '\n        ' + e.message); fail++;
+    }
+  };
+
   await kiem('mat khau dung: vao duoc', true, false, MK);
   await kiem('mat khau sai: bi tu choi', false, false, 'sai-mat-khau');
   await kiem('mat khau rong: bi tu choi', false, false, '');
   await kiem('backend cu (chua deploy): bi tu choi', false, true, 'bat-ky-gi-ca');
+
+  /* --- Lưu phải đúng định dạng mà Code.gs đọc ---
+     Code.gs chỉ đọc tham số `payload` dạng JSON cho cmsSave. Trước đây
+     admin.js gửi key/value rời nên backend trả "Thiếu dữ liệu (payload)"
+     và không lưu gì — mà giao diện vẫn có thể tưởng đã lưu. */
+  await kiemHam('luu dung dinh dang payload, khong gui key/value rời', async () => {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const p = await ctx.newPage();
+    const nhan = [];
+    await p.route('**/script.google.com/**', r => {
+      const u = new global.URL(r.request().url());
+      const cb = u.searchParams.get('callback') || 'cb';
+      const act = (u.searchParams.get('action') || '').toLowerCase();
+      const raw = u.searchParams.get('payload');
+      let pl = {}; if (raw) { try { pl = JSON.parse(raw); } catch (e) { pl = { HONG: raw }; } }
+
+      if (act === 'cmssave') {
+        nhan.push({
+          coKeyRieng: u.searchParams.has('key'),
+          coValueRieng: u.searchParams.has('value'),
+          khoaTrongPayload: pl.key,
+          coMatKhau: !!(pl.password)
+        });
+        /* Mô phỏng Code.gs thật: không có payload thì từ chối. */
+        return r.fulfill({ status: 200, contentType: 'application/javascript; charset=utf-8',
+          body: cb + '(' + JSON.stringify(raw
+            ? { ok: true, key: pl.key }
+            : { ok: false, message: 'Thiếu dữ liệu (payload) cho cmsSave.' }) + ');' });
+      }
+      const dl = act === 'verify' ? { ok: true, xacNhan: true }
+                                  : { ok: true, content: { profile_title_1: 'Nữ lãnh đạo' } };
+      r.fulfill({ status: 200, contentType: 'application/javascript; charset=utf-8',
+                  body: cb + '(' + JSON.stringify(dl) + ');' });
+    });
+
+    await p.goto(URL, { waitUntil: 'load' });
+    await p.waitForTimeout(400);
+    await p.fill('#gatePass', MK);
+    await p.click('#gateBtn');
+    await p.waitForTimeout(1500);
+
+    const daVao = await p.evaluate(() => !document.getElementById('app').hidden);
+    if (!daVao) throw new Error('khong vao duoc trang quan tri');
+
+    const truoc = nhan.length;
+    await p.evaluate(() => {
+      const el = document.querySelector('#fields [data-khoa]');
+      if (!el) return;
+      el.value = 'CHU THU NGHIEM LUU';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await p.click('#saveSection');
+    await p.waitForTimeout(2500);
+
+    if (nhan.length === truoc) throw new Error('khong co yeu cau luu nao duoc gui');
+    const x = nhan[0];
+    if (x.coKeyRieng || x.coValueRieng) throw new Error('van gui key/value rieng — backend se tu choi');
+    if (!x.khoaTrongPayload) throw new Error('payload khong co khoa');
+    if (!x.coMatKhau) throw new Error('payload khong co mat khau');
+    await ctx.close();
+    return true;
+  });
 
   console.log('\n  Dat: ' + pass + ' | Loi: ' + fail);
   await browser.close();

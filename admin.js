@@ -480,7 +480,7 @@
           capNhatDauCham();
           capNhatTrangThai();
           thongBao('ok', 'Đã lưu ' + ketQua.ok + ' ô vào Google Sheets',
-                   'Trang sẽ hiện nội dung mới sau khi tải lại. Nhớ bấm "Áp dụng" nếu đang ở bước cuối.');
+                   'Trang web sẽ hiện nội dung mới ngay lần tải kế tiếp.');
           $$('#fields [data-khoa]').forEach(function (el) { demKyTu(el); });
         } else {
           capNhatTrangThai();
@@ -492,7 +492,11 @@
       var t = thayDoi[i];
 
       /* Dùng JSONP cho thao tác ghi, để ĐỌC ĐƯỢC thông báo lỗi từ Apps Script.
-         Gửi bằng fetch no-cors sẽ không đọc được phản hồi. */
+         Gửi bằng fetch no-cors sẽ không đọc được phản hồi.
+
+         Quan trọng: dữ liệu phải nằm trong tham số `payload` dạng JSON.
+         Code.gs chỉ đọc payload cho cmsSave; nếu gửi key/value rời thì
+         backend trả "Thiếu dữ liệu (payload)" và KHÔNG lưu gì cả. */
       var cbName = '__kokoSave' + Math.random().toString(36).slice(2, 11);
       var s = document.createElement('script');
       var het = setTimeout(function () {
@@ -515,9 +519,9 @@
       };
       s.src = CFG.backend +
         '?action=cmsSave' +
-        '&key=' + encodeURIComponent(t.k) +
-        '&value=' + encodeURIComponent(t.v) +
-        '&password=' + encodeURIComponent(matKhau) +
+        '&payload=' + encodeURIComponent(JSON.stringify({
+          action: 'cmsSave', key: t.k, value: t.v, password: matKhau
+        })) +
         '&callback=' + cbName;
       document.head.appendChild(s);
     };

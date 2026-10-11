@@ -373,30 +373,108 @@ let DA_LUU = [];
     await p.close();
   });
 
-  await kiem('sau khi luu: trang tai lai, noi dung moi hien', async () => {
+  await kiem('sau khi luu: trang KHONG tai lai va noi dung moi hien ngay', async () => {
     NOIDUNG_GIA = {};
     const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     await fakeBackend(p);
+    await p.addInitScript(() => {
+      /* Đánh dấu để biết trang có bị tải lại hay không. */
+      window.__LAN_TAI_LAI = (window.__LAN_TAI_LAI || 0) + 1;
+    });
 
     await p.goto(URL + '?edit', { waitUntil: 'load' });
     await p.waitForTimeout(500);
     await p.fill('#edPass', MK);
     await p.click('#edOk');
-    await p.waitForTimeout(1100);
+    await p.waitForTimeout(1200);
 
-    // Lần nạp trang này giả lập việc vừa bấm Lưu: giờ Sheet đã có nội dung
-    NOIDUNG_GIA = { hero_kicker: 'NOI DUNG DA LUU' };
-    await p.reload({ waitUntil: 'load' });
+    const truoc = await p.evaluate(() => ({
+      lan: window.__LAN_TAI_LAI,
+      gt: document.querySelector('[data-ed-khoa="hero_kicker"]').textContent
+    }));
+
+    await p.evaluate(() => {
+      const el = document.querySelector('[data-ed-khoa="hero_kicker"]');
+      el.click(); el.textContent = 'SAU KHI LUU';
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    await p.waitForTimeout(250);
+    await p.click('#edSave');
+    await p.waitForTimeout(1600);
+
+    const sau = await p.evaluate(() => ({
+      lan: window.__LAN_TAI_LAI,
+      gt: document.querySelector('[data-ed-khoa="hero_kicker"]').textContent,
+      count: document.getElementById('edCount').textContent,
+      saveDisabled: document.getElementById('edSave').disabled,
+      toast: Array.from(document.querySelectorAll('.ed-toast')).map(x => x.textContent).join(' | ')
+    }));
+
+    doi(sau.lan, truoc.lan, 'KHONG duoc tai lai trang — lai phai nhap mat khau');
+    doi(sau.gt, 'SAU KHI LUU', 'chu tren trang phai la noi dung vua luu');
+    doi(sau.count, 'Chưa sửa gì', 'phai het danh sach thay doi');
+    doi(sau.saveDisabled, true, 'nut luu phai tat');
+    await p.close();
+  });
+
+  await kiem('bam vao o giua trang: trang KHONG nhay', async () => {
+    /* Do duoc truoc khi sua: bam vao o o giua trang lam trang nhay 105px,
+       do trinh duyet tu cuon o vao giua man hinh. */
+    NOIDUNG_GIA = {};
+    const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    await fakeBackend(p);
+    await p.goto(URL + '?edit', { waitUntil: 'load' });
     await p.waitForTimeout(500);
     await p.fill('#edPass', MK);
     await p.click('#edOk');
-    await p.waitForTimeout(1400);
+    await p.waitForTimeout(1300);
+
+    await p.evaluate(() => {
+      const el = document.querySelector('[data-ed-khoa="profile_title_1"]');
+      el.scrollIntoView({ block: 'center' });
+    });
+    await p.waitForTimeout(700);
+
+    const o = await p.evaluate(() => {
+      const el = document.querySelector('[data-ed-khoa="profile_title_1"]');
+      const r = el.getBoundingClientRect();
+      return { x: r.x + r.width / 2, y: r.y + r.height / 2, scrollY: window.scrollY };
+    });
+
+    await p.mouse.click(o.x, o.y);
+    await p.waitForTimeout(600);
+
+    const r = await p.evaluate(() => ({
+      scrollY: window.scrollY,
+      dangSua: document.querySelector('[data-ed-khoa="profile_title_1"]').classList.contains('ed-sua')
+    }));
+
+    doi(r.dangSua, true, 'phai vao duoc che do sua');
+    if (Math.abs(r.scrollY - o.scrollY) > 5) {
+      throw new Error('trang nhay ' + (r.scrollY - o.scrollY) + 'px khi bam vao o');
+    }
+    await p.close();
+  });
+
+  await kiem('khong ve vien hang loat khi moi bat che do sua', async () => {
+    NOIDUNG_GIA = {};
+    const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    await fakeBackend(p);
+    await p.goto(URL + '?edit', { waitUntil: 'load' });
+    await p.waitForTimeout(500);
+    await p.fill('#edPass', MK);
+    await p.click('#edOk');
+    await p.waitForTimeout(1300);
 
     const r = await p.evaluate(() => {
-      const el = document.querySelector('[data-ed-khoa="hero_kicker"]');
-      return { gt: el.textContent };
+      const a = Array.from(document.querySelectorAll('[data-ed-khoa]'));
+      const coVien = a.filter(el => {
+        const s = getComputedStyle(el);
+        return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
+      }).length;
+      return { tong: a.length, coVien };
     });
-    doi(r.gt, 'NOI DUNG DA LUU', 'trang phai hien noi dung tu Sheet');
+    doi(r.coVien, 0, 'khong duoc ve vien ' + r.coVien + '/' + r.tong + ' o ngay tu dau — trang loon');
     await p.close();
   });
 

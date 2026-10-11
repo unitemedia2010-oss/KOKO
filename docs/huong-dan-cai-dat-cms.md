@@ -159,19 +159,42 @@ Chờ khoảng 1–2 phút, GitHub Pages dựng lại xong.
 
 ---
 
+## Nội dung sửa xong có lên trang không?
+
+**Có.** Nội dung trong Sheet là bản chính. Trang web tự lấy nội dung đó mỗi
+khi mở, nên:
+
+- Sửa ở `/admin.html` hay ở `?edit` — cùng một kết quả.
+- Khách vào trang thấy nội dung mới, không cần bạn build hay đẩy gì thêm.
+- Trình duyệt nhớ lại nội dung, nên lần sau mở là thấy ngay, không phải chờ.
+
+Một khu vực duy nhất không tự cập nhật: **phông chữ**. Thêm phông mới vẫn phải
+dán CSS rồi đẩy lên GitHub, vì phông nằm trong file CSS chứ không nằm trong Sheet.
+
+### Khi nào trang vẫn hiện chữ cũ
+
+- Bạn vừa lưu xong và **tải lại bằng tay** trong khoảng 4 giây đầu, trước khi
+  trang kịp hỏi Apps Script. Chờ một chút rồi tải lại là thấy.
+- Đã bấm **Khôi phục chữ gốc** — xoá sạch nội dung trong Sheet, trang về đúng chữ
+  trong `index.html`.
+- Backend chết hoặc sai URL: lúc đó trang im lặng giữ nguyên chữ có sẵn, không
+  báo lỗi để làm bạn lo. Kiểm tra bằng cách mở `URL?action=health&callback=kc`.
+
+---
+
 ## Dùng chế độ sửa tại chỗ
 
 Mở `https://linhtruong.vn/?edit`
 
 1. Nhập mật khẩu
-2. Bấm vào bất kỳ đoạn chữ nào — viền nét gạch hiện ra là chỗ sửa được
+2. Bấm vào bất kỳ đoạn chữ nào — rê chuột vào chỗ đó sẽ lên khung mảnh
 3. Gõ thay đổi, bấm **Esc** khi xong một chỗ
 4. Bấm **Lưu** (hoặc `Ctrl+S`)
 
-Chỗ nào sửa rồi mà chưa lưu sẽ có viền đặc. Bấm **Bỏ thay đổi** để quay lại.
+Chỗ nào sửa rồi mà chưa lưu sẽ nền vàng nhạt. Bấm **Bỏ thay đổi** để quay lại.
 
-Trang tải lại và nội dung trong Sheet hiện ra — nghĩa là **sửa xong là khách
-thấy ngay**, không cần đẩy GitHub.
+Lưu xong trang **không tải lại** — nội dung mới hiện ngay, và mọi lượt khách
+vào trang từ giờ cũng thấy bản mới.
 
 ### Đổi ảnh ngay trên trang
 

@@ -21,5 +21,8 @@
        Không dùng defer ở đây để bảo đảm thứ tự với app.js. --> <script src="js/text-fit.js"></script> <!-- CHẾ ĐỘ SỬA TRỰC TIẾP
        File này tự kiểm tra đuôi ?edit trong URL. Không có đuôi đó thì nó
        thoát ngay và không tạo ra thao tác nào, nên người xem bình thường
-       không tải thêm gì cả. --> <script defer src="js/editor.js"></script> <script defer src="js/portal.js"></script> <script defer src="js/shader.js"></script> <script defer src="js/app.js"></script> </body>
+       không tải thêm gì cả. --> <!-- Noi dung sua trong Google Sheets: dan len trang that.
+     File tu kiem tra ?edit nen che do sua tai cho khong bi dung 2 lan. -->
+  <script defer src="js/cms-load.js"></script>
+  <script defer src="js/editor.js"></script> <script defer src="js/portal.js"></script> <script defer src="js/shader.js"></script> <script defer src="js/app.js"></script> </body>
 </html>
